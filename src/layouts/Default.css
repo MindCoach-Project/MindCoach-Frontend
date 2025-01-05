@@ -1,0 +1,17 @@
+.a-wrapper {
+    display: flex;
+    width: 100%;
+}
+.a-content {
+    width: 100%;
+} 
+.btn-show-side-bar{
+    position: absolute;
+    top: 0;
+    left: 10px;
+    z-index: 100;
+    background-color: transparent;
+    font-size: 25px;
+    color: #fff;
+    border: none;
+}
