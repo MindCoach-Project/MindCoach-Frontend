@@ -31,16 +31,16 @@ function Login() {
     }
   }
   return (
-    <div className="full-page-container">
-      <div className="card shadow border-0 my-4">
-        <div className="card-header bg-secondary bg-gradient ml-0 py-4">
-          <div className="row">
-            <div className="col-12 text-center">
-              <h1 className="py-2 text-white">Log in</h1>
+    <div className="">
+      <div className="">
+        <div className="ml-0 py-4">
+          <div className="">
+            <div className="">
+              <h1 className="py-2 text-red100">Log in</h1>
             </div>
           </div>
         </div>
-        <div className="card-body p-4">
+        <div className="p-4">
           <div className="row pt-3">
             <div className="col-md-12">
               <section>
@@ -78,7 +78,7 @@ function Login() {
                       name="password"
                       autoComplete="current-password"
                     />
-                    <label htmlFor="Password" className="form-label">
+                    <label htmlFor="Password" className="form-label text-red90">
                       Password
                     </label>
                   </div>

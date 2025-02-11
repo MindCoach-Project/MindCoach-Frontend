@@ -4,7 +4,7 @@ import { publicRoutes, privateRoutes } from './routes';
 import { DefaultLayout } from './layouts';
 import { useGlobalState } from './global/state';
 import { ProtectedRoute } from './components';
-
+import "./index.css";
 function App() {
 
    const [state, dispatch] = useGlobalState();

@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;700&display=swap');
+
+/* Reset Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%; /* Default font size for rem units */
+}
+
+.container {
+  max-width: 800px; /* Chiều rộng tối đa */
+  margin: 0 auto; /* Canh giữa */
+  padding: 0 1rem; /* Padding bên trái và bên phải */
+}
+
+/* Responsive Utility Classes */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
