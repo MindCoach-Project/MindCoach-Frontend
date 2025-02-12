@@ -60,6 +60,11 @@ const config = {
         "30": "1.875rem",
         "42": "42px",
       },
+      lineHeight: {
+        base: "1.5", 
+        lg: "1.75", 
+        xl: "2", 
+      },
       backgroundColors: {
         orange: "rgba(245, 139, 16, 1)",
         red100: "rgba(138, 2, 7, 1)",
@@ -81,6 +86,8 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwind-scrollbar-hide"),
+  ],
 };
 export default config;
