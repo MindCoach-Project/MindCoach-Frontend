@@ -1,5 +1,5 @@
 import { LoginLayout } from '../layouts';
-import { Login } from '../pages';
+import { Login, Register } from '../pages';
 import { site_path } from "../utils"
 
 const publicRoutes = [
@@ -8,6 +8,12 @@ const publicRoutes = [
         component: Login,
         layout: LoginLayout
      },
+     {
+        path: site_path.REGISTER,
+        component: Register,
+        layout: LoginLayout
+     }
+     
 ];
 const privateRoutes = [];
 export { publicRoutes, privateRoutes };

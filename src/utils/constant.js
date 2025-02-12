@@ -4,7 +4,10 @@ export const USER_ROLE = {
 }
 
 export const site_path = {
-    HOME: '/',
+    INTRO: '/',
+    HOME: '/home',
     LOGIN: '/login',
+    REGISTER: '/register',
+    FORGOT_PASSWORD: '/forgot-password',
     LOG_OUT: '/logout',
 };
