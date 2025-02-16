@@ -1,4 +1,4 @@
-import { Home, Intro } from "../pages";
+import { Home, Intro, ListTasks } from "../pages";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout } from "../layouts";
@@ -18,6 +18,11 @@ let privateRoutes = [
     component: Home,
     error: AthUtils.handleAuthorization,
   },
+  {
+    path: "/tasks",
+    component: ListTasks,
+    error: AthUtils.handleAuthorization,
+  }
 ];
 
 files.keys().forEach((fileName) => {

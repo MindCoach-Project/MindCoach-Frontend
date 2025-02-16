@@ -4,7 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;700&display=swap');
 
-/* Reset Styles */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -23,25 +23,20 @@ html, body {
 .container {
   width: 90vw; 
   max-width: 450px; 
-  height: 96vh; 
-  max-height: 800px; 
+  height: 100vh; 
 
-  background-color: white;
   margin: auto;
-  border-radius: 30px;
-  border: 6px solid #3e3e3e; 
 
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
   padding: 1.5rem;
-
 }
 .overflow-y-auto {
-  overflow-y: overlay; /* Thay vì auto */
+  overflow-y: overlay;
 }
-/* Responsive */
+
 @media (max-width: 640px) {
   .container {
     width: 100%;

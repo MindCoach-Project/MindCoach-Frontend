@@ -3,9 +3,9 @@ import Navigation from "./Navigation";
 
 function Default({ children }) {
   return (
-    <div className="container flex flex-col overflow-hidden">
+    <div className="container flex flex-col">
       <Header />
-      <div className="overflow-y-overlay bg-orange pb-16 scrollbar-hide">{children}</div>
+      <div className="overflow-y-auto scrollbar-hide">{children}</div>
       <Navigation />
     </div>
   );

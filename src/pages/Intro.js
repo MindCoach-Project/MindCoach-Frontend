@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Logo, PageTitle } from "../components/ui";
+import { Link } from "react-router-dom";
 const Intro = () => {
   const navigate = useNavigate();
 
@@ -29,7 +30,9 @@ const Intro = () => {
         alt="image intro"
         width={240}
       />
-      <Button>Get started</Button>
+      <Button size="lg">
+        <Link to="/home">Get started</Link>
+      </Button>
     </div>
   );
 };

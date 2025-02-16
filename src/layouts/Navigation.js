@@ -1,34 +1,36 @@
 import React from "react";
-import { FaHome, FaRegListAlt, FaRegCircle, FaRegCheckCircle, FaUsers } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import {
+  FaHome,
+  FaClipboardList,
+  FaBell,
+  FaCheckCircle,
+  FaUser,
+} from "react-icons/fa";
+import { NavItem } from "../components/ui";
 
 function Navigation() {
-    return (
-        <nav className="absolute w-full bottom-0 left-0 bg-orange border-gray-200">
-            <div className="flex justify-around p-3">
-                <Link to="/home" className="flex flex-col items-center text-gray-700">
-                    <FaHome size={24} />
-                    <span className="text-sm">Home</span>
-                </Link>
-                <Link to="/list" className="flex flex-col items-center text-gray-700">
-                    <FaRegListAlt size={24} />
-                    <span className="text-sm">List</span>
-                </Link>
-                <Link to="/circle" className="flex flex-col items-center text-gray-700">
-                    <FaRegCircle size={24} />
-                    <span className="text-sm">Circle</span>
-                </Link>
-                <Link to="/check" className="flex flex-col items-center text-gray-700">
-                    <FaRegCheckCircle size={24} />
-                    <span className="text-sm">Check</span>
-                </Link>
-                <Link to="/users" className="flex flex-col items-center text-gray-700">
-                    <FaUsers size={24} />
-                    <span className="text-sm">Users</span>
-                </Link>
-            </div>
-        </nav>
-    );
+  const menuItems = [
+    { id: 1, to: "/home", icon: FaHome, label: "Home" },
+    { id: 2, to: "/tasks", icon: FaClipboardList, label: "Task" },
+    { id: 3, to: "/reminder", icon: FaBell, label: "Reminder" },
+    { id: 4, to: "/complete", icon: FaCheckCircle, label: "Complete" },
+    { id: 5, to: "/profile", icon: FaUser, label: "Profile" },
+  ];
+
+  return (
+    <nav className="absolute w-full bottom-0 left-0 border-gray-200 bg-white shadow-md z-100">
+      <div className="flex justify-around p-3">
+        {menuItems.map((item) => (
+          <NavItem
+            key={item.id}
+            to={item.to}
+            icon={item.icon}
+            label={item.label}
+          />
+        ))}
+      </div>
+    </nav>
+  );
 }
 
 export default Navigation;
