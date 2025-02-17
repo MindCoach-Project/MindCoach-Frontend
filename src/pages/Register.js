@@ -41,6 +41,8 @@ function Register() {
       validationErrors.password = "Password is required.";
     } else if (formData.password.length < 8) {
       validationErrors.password = "Password must have at least 8 characters.";
+    } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])/.test(formData.password)) {
+      validationErrors.password = "Password must include letters, numbers, and special characters.";
     }
 
     if (!formData.confirmPassword) {
@@ -63,7 +65,7 @@ function Register() {
 
     try {
       const response = await registerUser(formData);
-      setToast({ type: "success", message: response.message });
+      setToast({ type: "success", message: "Register sucessful!" });
       setTimeout(() => navigate(site_path.LOGIN), 2000);
     } catch (error) {
       if (error.status === 400 && error.errors) {
