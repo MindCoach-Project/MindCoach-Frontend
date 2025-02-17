@@ -58,7 +58,11 @@ function Register() {
           type="password"
           placeholder="Confirm your password"
         />
-        <Button type="submit">Sign Up</Button>
+        <div className="flex justify-center">
+          <Button className="w-1/2" size="lg" type="submit">
+            Sign Up
+          </Button>
+        </div>
       </form>
       <p className="text-16 text-gray-700">
         Already have an account? <Link to="/login" className="text-orange">Sign In</Link>

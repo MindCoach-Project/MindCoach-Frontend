@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1026970670186",
+    "project_id": "mindcoach-bd0cc",
+    "storage_bucket": "mindcoach-bd0cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026970670186:android:180aeec1e7f1900e4ae613",
+        "android_client_info": {
+          "package_name": "mindcoach.test.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9StMUladnFBE67odbQbkwq8tYlKQLXjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
