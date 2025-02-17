@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { registerUser } from "../api/auth/register";
+import { registerUser } from "../api/";
 import { site_path } from "../utils";
 import { Logo, PageTitle, Input, Button } from "../components/ui";
 import ToastMessage from "../components/ui/ToastMessage";
