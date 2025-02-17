@@ -1,60 +1,56 @@
-// // src/components/ui/Input.js
-// import React from "react";
+// import * as React from "react";
+// import { cn } from "../../libs/utils";
 
-// const Input = ({
-//   label,
-//   type = "text",
-//   placeholder = "",
-//   value,
-//   onChange,
-//   className = "",
-//   required = false,
-//   id,
-//   ...props
-// }) => {
-//   return (
-//     <div className={`w-full ${className}`}>
-//       {label && (
-//         <label htmlFor={id} className="block text-16 text-left font-medium text-brown mb-1">
-//           {label} {required && <span className="text-red-500">*</span>}
-//         </label>
-//       )}
-//       <input
-//         id={id}
-//         type={type}
-//         placeholder={placeholder}
-//         value={value}
-//         onChange={onChange}
-//         className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-brown"
-//         required={required}
-//         {...props}
-//       />
-//     </div>
-//   );
-// };
+// const Input = React.forwardRef(
+//   ({ className, type, label, id, ...props }, ref) => {
+//     return (
+//       <div className="flex flex-col space-y-1">
+//         {label && (
+//           <label htmlFor={id} className="text-left text-14 text-brown">
+//             {label}
+//           </label>
+//         )}
+//         <input
+//           id={id}
+//           type={type}
+//           className={cn(
+//             "flex h-10 w-full rounded-full border border-input bg-background px-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brown",
+//             className
+//           )}
+//           ref={ref}
+//           {...props}
+//         />
+//       </div>
+//     );
+//   }
+// );
 
-// export default Input;
+// Input.displayName = "Input";
 
-import * as React from "react"
+// export { Input };
+
+import * as React from "react";
 import { cn } from "../../libs/utils";
 
-
-const Input = React.forwardRef(
-  ({ className, type, ...props }, ref) => {
-    return (
+const Input = React.forwardRef(({ className, type, label, error, ...props }, ref) => {
+  return (
+    <div className="flex flex-col space-y-1">
+      {label && <label className="text-left text-14 text-brown">{label}</label>}
       <input
         type={type}
         className={cn(
           "flex h-10 w-full rounded-full border border-input bg-background px-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brown",
+          error ? "border-red-500 focus:ring-red-200" : "",
           className
         )}
         ref={ref}
         {...props}
       />
-    )
-  }
-)
-Input.displayName = "Input"
+      {error && <p className="text-red-600 text-left text-sm mt-1">{error}</p>}
+    </div>
+  );
+});
 
-export { Input }
+Input.displayName = "Input";
+export { Input };
 
