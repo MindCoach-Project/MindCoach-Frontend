@@ -6,6 +6,9 @@ export const USER_ROLE = {
 export const site_path = {
     INTRO: '/',
     HOME: '/home',
+    TASKS: 'tasks',
+    PROFILE: '/profile',
+  
     LOGIN: '/login',
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',

@@ -1,7 +1,7 @@
-import { Home, Intro, ListTasks } from "../pages";
+import { Home, Intro, ListTasks, Profile } from "../pages";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
-import { LoginLayout } from "../layouts";
+import { LoginLayout, DefaultLayout } from "../layouts";
 
 const files = require.context(".", false, /\.js$/);
 
@@ -14,14 +14,21 @@ let publicRoutes = [
 ];
 let privateRoutes = [
   {
-    path: "/home",
+    path: site_path.HOME,
     component: Home,
+    layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
   },
   {
-    path: "/tasks",
+    path: site_path.TASKS,
     component: ListTasks,
+    layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
+  }, 
+  {
+    path: site_path.PROFILE,
+    component:Profile ,
+    layout: DefaultLayout,
   }
 ];
 

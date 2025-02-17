@@ -7,37 +7,25 @@ import { EventModal } from "../components/Task";
 import { Plus } from "lucide-react";
 import { Button } from "../components/ui";
 import { PushNotificationManager } from "../components/Notification";
-
+import { scheduleLocalNotification } from "../components/Notification/PushNotificationManager"
+import { scheduleNotification } from "../utils";
 // Example events data matching the screenshot
 const initialEvents = [
   {
     id: "1",
     title: "Check email",
-    start: new Date(2024, 1, 13, 8, 0),
-    end: new Date(2024, 1, 13, 8, 30),
+    start: new Date(2025, 2, 16, 21, 0),
+    end: new Date(2025, 2, 16, 21, 30),
     type: "Reply client",
   },
   {
     id: "2",
     title: "Write documentation",
-    start: new Date(2024, 1, 13, 10, 0),
-    end: new Date(2024, 1, 13, 11, 0),
+    start: new Date(2025, 2, 16, 21, 30),
+    end: new Date(2025, 2, 16, 21, 50),
     type: "Write docs",
   },
-  {
-    id: "3",
-    title: "Monthly Report",
-    start: new Date(2024, 1, 13, 14, 0),
-    end: new Date(2024, 1, 13, 15, 0),
-    type: "Report",
-  },
-  {
-    id: "4",
-    title: "Team Meeting",
-    start: new Date(2024, 1, 13, 16, 0),
-    end: new Date(2024, 1, 13, 17, 0),
-    type: "Meeting",
-  },
+
 ]
 
 export default function CalendarPage() {
@@ -63,6 +51,7 @@ export default function CalendarPage() {
     } else {
       setEvents([...events, eventData])
     }
+    scheduleNotification(eventData)
   }
 
   const handleTimeClick = (time) => {
@@ -75,6 +64,18 @@ export default function CalendarPage() {
     setSelectedEvent(event)
     setSelectedTime(null)
     setIsModalOpen(true)
+  }
+
+  const testNotification = () => {
+    const now = new Date()
+    const testNotificationTime = new Date(now.getTime() + 5000) // 5 seconds from now
+    scheduleLocalNotification(
+      9999,
+      "Test Notification",
+      "This is a test notification",
+      testNotificationTime.toISOString(),
+    )
+    console.log("Test notification scheduled for", testNotificationTime)
   }
 
   return (
@@ -90,6 +91,9 @@ export default function CalendarPage() {
           onEventClick={handleEventClick}
         />
       </div>
+      <Button className="fixed bottom-16 right-4 rounded-full shadow-lg" onClick={testNotification}>
+        Test Notification
+      </Button>
       <Button
         className="fixed bottom-4 right-4 rounded-full shadow-lg"
         onClick={() => {

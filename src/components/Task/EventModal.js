@@ -97,21 +97,22 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
           <div className="space-y-2">
             <Label className="text-base">Time</Label>
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex gap-2">
-                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-24" />
-                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              </div>
-              <div className="flex gap-2">
-                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-24" />
-                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-              </div>
-            </div>
+  <div className="flex flex-col gap-2">
+    <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full" />
+    <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full" />
+  </div>
+  <div className="flex flex-col gap-2">
+    <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full" />
+    <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full" />
+  </div>
+</div>
+
           </div>
 
           <div className="space-y-2">
             <Label className="text-base">Priority</Label>
             <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger className="w-24 bg-red-50 border-red-100 text-red-900">
+              <SelectTrigger className="w-1/2 bg-red-50 border-red-100 text-red-900">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

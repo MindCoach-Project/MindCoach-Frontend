@@ -15,5 +15,6 @@ const publicRoutes = [
      }
      
 ];
-const privateRoutes = [];
+const privateRoutes = [
+];
 export { publicRoutes, privateRoutes };
