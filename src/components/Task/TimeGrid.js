@@ -12,6 +12,49 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
     addDays(startOfWeek(date, { weekStartsOn: 1 }), i)
   );
 
+  const handleEventClick = async (event) => {
+    try {
+      onEventClick(event);
+    } catch (error) {
+      console.error("Error handling event click:", error);
+    }
+  };
+
+  // Update the event click handlers in both views
+  const renderEvent = (event, dayIndex = null) => {
+    const { top, height } = getEventPosition(event);
+    const style =
+      dayIndex !== null
+        ? {
+            left: `${(dayIndex * 100) / 7}%`,
+            width: `${100 / 7}%`,
+            top,
+            height,
+            minHeight: "20px",
+          }
+        : { top, height, minHeight: "20px" };
+
+    return (
+      <div
+        key={event.id}
+        className={cn(
+          "absolute rounded-md border p-2 cursor-pointer",
+          getEventStyle(event)
+        )}
+        style={style}
+        onClick={() => handleEventClick(event)}
+      >
+        <div className="text-xs font-medium truncate">{event.title}</div>
+        {view === "day" && (
+          <div className="text-xs text-muted-foreground">
+            {format(new Date(event.start), "HH:mm")} -{" "}
+            {format(new Date(event.end), "HH:mm")}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const getEventStyle = (event) => {
     const typeColors = {
       Report: "bg-orange-100 border-orange-200 text-orange-700",
@@ -43,7 +86,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
   const renderWeekView = () => (
     <div className="flex flex-1 overflow-auto">
       {/* Time column */}
-      <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-10">
+      <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
         <div className="h-12 border-b pt-[40px]" /> {/* Header spacer */}
         {hours.map((hour) => (
           <div
@@ -120,29 +163,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
             >
               {events
                 .filter((event) => isSameDay(new Date(event.start), day))
-                .map((event) => {
-                  const { top, height } = getEventPosition(event);
-
-                  return (
-                    <div
-                      key={event.id}
-                      className={cn(
-                        "absolute left-1 right-1 rounded-md border p-2 cursor-pointer",
-                        getEventStyle(event)
-                      )}
-                      style={{
-                        top,
-                        height,
-                        minHeight: "20px",
-                      }}
-                      onClick={() => onEventClick(event)}
-                    >
-                      <div className="text-xs font-medium truncate">
-                        {event.title}
-                      </div>
-                    </div>
-                  );
-                })}
+                .map((event) => renderEvent(event, dayIndex))}
             </div>
           ))}
         </div>
@@ -152,7 +173,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
 
   const renderDayView = () => (
     <div className="flex flex-1 overflow-auto">
-      <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-10">
+      <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
         {hours.map((hour) => (
           <div
             key={hour}
@@ -177,33 +198,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
           ))}
           {events
             .filter((event) => isSameDay(new Date(event.start), date))
-            .map((event) => {
-              const { top, height } = getEventPosition(event);
-
-              return (
-                <div
-                  key={event.id}
-                  className={cn(
-                    "absolute left-1 right-1 rounded-md border p-2 cursor-pointer",
-                    getEventStyle(event)
-                  )}
-                  style={{
-                    top,
-                    height,
-                    minHeight: "20px",
-                  }}
-                  onClick={() => onEventClick(event)}
-                >
-                  <div className="text-sm font-medium truncate">
-                    {event.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {format(new Date(event.start), "HH:mm")} -{" "}
-                    {format(new Date(event.end), "HH:mm")}
-                  </div>
-                </div>
-              );
-            })}
+            .map((event) => renderEvent(event))}
         </div>
       </div>
     </div>
@@ -214,7 +209,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
       <div className="flex-1 overflow-auto">
         <div className="min-h-[720px] mt-10">
           {" "}
-          {view === "week" ? renderWeekView() : renderDayView()}
+          {view === "day" ? renderDayView() : renderWeekView()}
         </div>
       </div>
     </div>
