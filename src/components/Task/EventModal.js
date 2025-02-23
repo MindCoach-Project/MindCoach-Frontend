@@ -12,7 +12,7 @@ import { Input } from "../ui";
 import { Button } from "../ui";
 import { Label } from "../ui";
 import { Textarea } from "../ui";
-import { Clock, X, Plus } from "lucide-react";
+import { Clock, X, Plus, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,7 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui";
-import { createTask, updateTask, deleteSubTask } from "../../api/task";
+import {
+  createTask,
+  updateTask,
+  deleteSubTask,
+  deleteTask,
+} from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
 import { toZonedTime, format } from "date-fns-tz";
 const timeZone = "Asia/Ho_Chi_Minh";
@@ -93,12 +98,23 @@ export function EventModal({
 
   const handleRemoveSubtask = async (id) => {
     const isDeleted = await deleteSubTask(id);
-  
+
     if (isDeleted) {
       setSubtasks(subtasks.filter((task) => task.id !== id));
     } else {
       alert("Failed to delete subtask. Please try again.");
-    }  };
+    }
+  };
+
+  const handleRemoveTask = async (taskId) => {
+    console.log("id task", taskId);
+    const isDeleted = await deleteTask(taskId);
+    if (isDeleted) {
+      onClose();
+    } else {
+      alert("Failed to delete task. Please try again.");
+    }
+  };
 
   const validateForm = () => {
     const start = new Date(`${startDate}T${startTime}`);
@@ -117,7 +133,6 @@ export function EventModal({
     setError("");
     return true;
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -158,10 +173,21 @@ export function EventModal({
             <DialogTitle>
               {defaultValues ? "Edit Task" : "Create Task"}
             </DialogTitle>
-            <DialogClose className="absolute right-4 top-4">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
+
+            <div className="absolute right-4 top-4 flex space-x-3">
+              {defaultValues?.id && (
+                <button
+                  onClick={() => handleRemoveTask(defaultValues?.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash className="h-5 w-5" />
+                </button>
+              )}
+
+              <DialogClose className="rounded-sm opacity-70 hover:opacity-100">
+                <X className="h-5 w-5" />
+              </DialogClose>
+            </div>
           </DialogHeader>
 
           {error && (
