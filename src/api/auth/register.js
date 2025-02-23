@@ -1,18 +1,11 @@
 import axios from "axios";
-import { API_BASE_URL } from "../../global/state";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/register`,
-      userData
-    );
+    const response = await axios.post(`${apiUrl}/auth/register`, userData);
 
-    if (response && response.data) {
-      return response.data.data;
-    } else {
-      throw new Error("Invalid response from server.");
-    }
+    return response.data.data;
   } catch (error) {
     throw error.response.data;
   }

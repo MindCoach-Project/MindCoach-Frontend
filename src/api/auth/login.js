@@ -1,15 +1,10 @@
 import axios from "axios";
-import { API_BASE_URL } from "../../global/state/constants";
-import { toast } from "react-toastify";
-
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 export const loginUser = async (userData) => {
-  
   try {
-    toast.message('login'); // ko vào
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, userData);
-    toast.message(response); // ko vào
+    const response = await axios.post(`${apiUrl}/auth/login`, userData);
     return response.data;
   } catch (error) {
-    return error;
+    throw error.response.data;
   }
 };
