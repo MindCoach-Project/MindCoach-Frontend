@@ -1,78 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalState } from "../global/state";
 import { actions } from "../global/state";
 import { site_path } from "../utils";
+import { validateLoginForm } from "../utils";
 import { Logo, PageTitle, Input, Button } from "../components/ui";
 import { Link, useNavigate } from "react-router-dom";
 import ToastMessage from "../components/ui/ToastMessage";
-import { loginUser } from "../api";
+import { loginUser } from "../api/auth/login";
 
 function Login() {
   const [state, dispatch] = useGlobalState();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" })); // Xóa lỗi khi nhập lại
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" })); 
   };
-
-  const validateForm = () => {
-    let validationErrors = {};
-
-    if (!formData.email.trim()) {
-      validationErrors.email = "Email is required.";
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      validationErrors.email = "Invalid email format.";
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate(site_path.HOME); 
     }
-
-    if (!formData.password) {
-      validationErrors.password = "Password is required.";
-    }
-
-    return validationErrors;
-  };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
+    const validationErrors = validateLoginForm(formData);
+    if (Object.values(validationErrors).some((error) => error)) {
       setErrors(validationErrors);
       return;
     }
 
     try {
-      const response = await loginUser(formData);
-      const { token, username, email, imageUrl } = response.data;
+      const { data } = await loginUser(formData);
+      const { token, username, email, imageUrl } = data;
 
-      // Lưu token vào localStorage
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify({ username, email, imageUrl }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ username, email, imageUrl })
+      );
 
-      // Cập nhật global state
-      dispatch(actions.setIsLogin(true));
-      dispatch(actions.setUser({ username, email, imageUrl }));
+      dispatch({ type: "SET_IS_LOGIN", payload: true });
+      dispatch({ type: "SET_USER", payload: { username, email, imageUrl } });
 
-      setToast({ type: "success", message: "Login sucessful!" });
-
+      setToast({ type: "success", message: "Login successful!" });
       navigate(site_path.HOME);
     } catch (error) {
-      if (error.status === 400) {
-        setErrors({ email: "Invalid email or password. Please try again." });
-      } else {
-        setToast({ type: "error", message: error.title || "Login failed." });
-      }
+      const errorMessage = "Invalid email or password.";
+      setErrors({ email: errorMessage, password: errorMessage });
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center gap-24">
+    <div className="flex flex-col items-center justify-center text-center gap-6">
       <Logo />
       <PageTitle title="Sign In" />
       <form className="w-full flex flex-col gap-6" onSubmit={handleLogin}>
@@ -94,7 +79,7 @@ function Login() {
           placeholder="Enter your password"
           value={formData.password}
           onChange={handleChange}
-          error={errors.email}
+          error={errors.password}
         />
         <p className="text-left text-16 text-brown">Forgot password?</p>
         <div className="flex justify-center">

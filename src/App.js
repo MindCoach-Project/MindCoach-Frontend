@@ -8,7 +8,6 @@ import "./index.css";
 function App() {
 
    const [state, dispatch] = useGlobalState();
-   console.log(state, dispatch)
    
    return (
       <Router>
