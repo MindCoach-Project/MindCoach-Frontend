@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -21,8 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui";
-import { createTask, updateTask } from "../../api/task";
+import { createTask, updateTask, deleteSubTask } from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
+import { toZonedTime, format } from "date-fns-tz";
+const timeZone = "Asia/Ho_Chi_Minh";
+
+const convertToUTC = (date, time) => {
+  const localTime = new Date(`${date}T${time}`);
+  return format(
+    toZonedTime(localTime, timeZone),
+    "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+    { timeZone: "UTC" }
+  );
+};
 
 export function EventModal({
   isOpen,
@@ -81,9 +91,14 @@ export function EventModal({
     }
   };
 
-  const handleRemoveSubtask = (id) => {
-    setSubtasks(subtasks.filter((task) => task.id !== id));
-  };
+  const handleRemoveSubtask = async (id) => {
+    const isDeleted = await deleteSubTask(id);
+  
+    if (isDeleted) {
+      setSubtasks(subtasks.filter((task) => task.id !== id));
+    } else {
+      alert("Failed to delete subtask. Please try again.");
+    }  };
 
   const validateForm = () => {
     const start = new Date(`${startDate}T${startTime}`);
@@ -103,27 +118,22 @@ export function EventModal({
     return true;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const start = new Date(`${startDate}T${startTime}`);
-    const end = new Date(`${endDate}T${endTime}`);
+    if (!validateForm()) return;
 
     const eventData = {
       title,
       description,
       priority,
-      startTime: start.toISOString(),
-      endTime: end.toISOString(),
+      startTime: convertToUTC(startDate, startTime),
+      endTime: convertToUTC(endDate, endTime),
       subTasks: subtasks.map((st) => ({
         ...(st.id && { id: st.id }),
         title: st.title,
-        startTime: new Date(`${st.startDate}T${st.startTime}`).toISOString(),
-        endTime: new Date(`${st.endDate}T${st.endTime}`).toISOString(),
+        startTime: convertToUTC(st.startDate, st.startTime),
+        endTime: convertToUTC(st.endDate, st.endTime),
         description: st.description || "",
       })),
     };

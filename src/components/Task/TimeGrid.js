@@ -38,7 +38,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
       <div
         key={event.id}
         className={cn(
-          "absolute rounded-md border p-2 cursor-pointer",
+          "absolute rounded-md w-full border p-2 cursor-pointer",
           getEventStyle(event)
         )}
         style={style}
@@ -159,7 +159,10 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
             <div
               key={day.toString()}
               className="absolute top-0 bottom-0"
-              style={{ left: `${(dayIndex * 100) / 7}%`, width: `${100 / 7}%` }}
+              style={{
+                left: `${(dayIndex * 100) / 7 - 12}%`,
+                width: `${100 / 7}%`,
+              }}
             >
               {events
                 .filter((event) => isSameDay(new Date(event.start), day))

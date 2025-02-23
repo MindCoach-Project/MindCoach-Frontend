@@ -1,11 +1,11 @@
 import axios from "axios";
 
 // Get API base URL from global constants
-import { API_BASE_URL } from "../global/state/constants";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
   },

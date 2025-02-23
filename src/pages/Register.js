@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api/";
 import { site_path } from "../utils";
+import { validateRegisterForm } from "../utils";
 import { Logo, PageTitle, Input, Button } from "../components/ui";
 import ToastMessage from "../components/ui/ToastMessage";
 
@@ -15,57 +15,30 @@ function Register() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const [toast, setToast] = useState(null); // Quản lý thông báo toast
+  const [toast, setToast] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // Xóa lỗi khi người dùng nhập lại
+    setErrors({ ...errors, [e.target.name]: "" });
   };
-
-  const validateForm = () => {
-    let validationErrors = {};
-
-    if (!formData.username.trim()) {
-      validationErrors.username = "Username is required.";
-    } else if (formData.username.length < 2) {
-      validationErrors.username = "Username must have at least 2 characters.";
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate(site_path.HOME); 
     }
-
-    if (!formData.email.trim()) {
-      validationErrors.email = "Email is required.";
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      validationErrors.email = "Invalid email format.";
-    }
-
-    if (!formData.password) {
-      validationErrors.password = "Password is required.";
-    } else if (formData.password.length < 8) {
-      validationErrors.password = "Password must have at least 8 characters.";
-    } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])/.test(formData.password)) {
-      validationErrors.password = "Password must include letters, numbers, and special characters.";
-    }
-
-    if (!formData.confirmPassword) {
-      validationErrors.confirmPassword = "Confirm Password is required.";
-    } else if (formData.password !== formData.confirmPassword) {
-      validationErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    return validationErrors;
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
+    const validationErrors = validateRegisterForm(formData);
+    if (Object.values(validationErrors).some((error) => error)) {
       setErrors(validationErrors);
       return;
     }
 
     try {
-      const response = await registerUser(formData);
-      setToast({ type: "success", message: "Register sucessful!" });
+      await registerUser(formData);
+      setToast({ type: "success", message: "Register successful!" });
       setTimeout(() => navigate(site_path.LOGIN), 2000);
     } catch (error) {
       if (error.status === 400 && error.errors) {
@@ -73,7 +46,10 @@ function Register() {
       } else if (error.status === 409) {
         setErrors({ email: "This email is already in use." });
       } else {
-        setToast({ type: "error", message: error.title || "Registration failed." });
+        setToast({
+          type: "error",
+          message: error.title || "Registration failed.",
+        });
       }
     }
   };
@@ -129,9 +105,6 @@ function Register() {
           </Button>
         </div>
       </form>
-      <p className="text-16 text-gray-700">
-        Already have an account? <Link to="/login" className="text-orange">Sign In</Link>
-      </p>
       {toast && <ToastMessage type={toast.type} message={toast.message} />}
     </div>
   );
