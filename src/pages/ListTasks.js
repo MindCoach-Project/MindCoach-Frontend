@@ -66,17 +66,18 @@ export default function CalendarPage() {
         title: taskDetails.title,
         description: taskDetails.description,
         priority: taskDetails.priority.toLowerCase(),
-        start: new Date(taskDetails.startTime),
-        end: new Date(taskDetails.endTime),
+        start: taskDetails.startTime,
+        end: taskDetails.endTime,
         subtasks:
           taskDetails.subTasks?.map((st) => ({
             id: st.id,
             title: st.title,
-            startTime: new Date(st.startTime),
-            endTime: new Date(st.endTime),
+            startTime: st.startTime,
+            endTime: st.endTime,
             description: st.description,
           })) || [],
-      }
+      };
+      console.log('================================', transformedTask);
 
       setSelectedEvent(transformedTask)
       setIsModalOpen(true)

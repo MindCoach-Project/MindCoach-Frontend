@@ -20,6 +20,42 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
     }
   };
 
+  // const getEventStyle = (event) => {
+  //   const colors = [
+  //     "bg-green-200 border-green-400 hover:bg-green-400",
+  //     "bg-yellow-200 border-yellow-400 hover:bg-yellow-400",
+  //     "bg-red-200 border-red-400 hover:bg-red-400",
+  //     "bg-purple-200 border-purple-400 hover:bg-purple-400",
+  //     "bg-blue-200 border-blue-400 hover:bg-blue-400",
+  //   ];
+
+  //   if (!event.color) {
+  //     event.color = colors[Math.floor(Math.random() * colors.length)];
+  //   }
+
+  //   return event.color;
+  // };
+
+  const getEventStyle = (event) => {
+    // Base colors for tasks and subtasks
+    const taskColors = {
+      high: "bg-red-200 border-red-400 hover:bg-red-300",
+      medium: "bg-yellow-200 border-yellow-400 hover:bg-yellow-300",
+      low: "bg-green-200 border-green-400 hover:bg-green-300",
+    };
+
+    const subtaskColors = {
+      high: "bg-red-100 border-red-300 hover:bg-red-200",
+      medium: "bg-yellow-100 border-yellow-300 hover:bg-yellow-200",
+      low: "bg-green-100 border-green-300 hover:bg-green-200",
+    };
+
+    // If it's a subtask, use lighter colors
+    return event.type === "SubTask"
+      ? subtaskColors[event.priority?.toLowerCase() || "medium"]
+      : taskColors[event.priority?.toLowerCase() || "medium"];
+  };
+
   // Update the event click handlers in both views
   const renderEvent = (event, dayIndex = null) => {
     const { top, height } = getEventPosition(event);
@@ -39,12 +75,16 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
         key={event.id}
         className={cn(
           "absolute rounded-md w-full border p-2 cursor-pointer",
-          getEventStyle(event)
+          getEventStyle(event),
+          event.type === "SubTask" && "ml-4 w-[calc(100%-1rem)]"
         )}
         style={style}
         onClick={() => handleEventClick(event)}
       >
-        <div className="text-xs font-medium truncate">{event.title}</div>
+        <div className="text-xs font-medium truncate">
+          {event.type === "SubTask" && "↳ "}
+          {event.title}
+        </div>
         {view === "day" && (
           <div className="text-xs text-muted-foreground">
             {format(new Date(event.start), "HH:mm")} -{" "}
@@ -53,19 +93,6 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
         )}
       </div>
     );
-  };
-
-  const getEventStyle = (event) => {
-    const typeColors = {
-      Report: "bg-orange-100 border-orange-200 text-orange-700",
-      "Reply client": "bg-green-100 border-green-200 text-green-700",
-      "Write docs": "bg-pink-100 border-pink-200 text-pink-700",
-      Meeting: "bg-blue-100 border-blue-200 text-blue-700",
-      default: "bg-gray-100 border-gray-200 text-gray-700",
-    };
-    return event.type && typeColors[event.type]
-      ? typeColors[event.type]
-      : typeColors.default;
   };
 
   const getEventPosition = (event) => {
@@ -160,7 +187,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
               key={day.toString()}
               className="absolute top-0 bottom-0"
               style={{
-                left: `${(dayIndex * 100) / 7 - 12}%`,
+                left: `${(dayIndex * 100) / 7}%`,
                 width: `${100 / 7}%`,
               }}
             >
