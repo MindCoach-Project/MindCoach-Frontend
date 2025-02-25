@@ -4,15 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import { CalendarHeader } from "../components/Task";
 import { TimeGrid } from "../components/Task";
 import { EventModal } from "../components/Task";
-// import { Plus } from "lucide-react";
-// import { Button } from "../components/ui";
-// import { PushNotificationManager } from "../components/Notification";
-// import { scheduleNotification } from "../utils";
 import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(new Date())
-  const [view, setView] = useState("week")
+  const [view, setView] = useState("day")
   const [events, setEvents] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
@@ -26,61 +22,90 @@ export default function CalendarPage() {
 
   const fetchEvents = async () => {
     try {
-      const tasks = view === "week" ? await getTasksByWeek(date) : await getTasksByDay(date)
-      console.log("Events", tasks);
-
+      setIsLoading(true);
+      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date)
+      
       // Transform API response to match the event format
       const transformedEvents = tasks.map((task) => ({
         id: task.id,
         title: task.title,
         description: task.description,
         priority: task.priority.toLowerCase(),
+        status: task.status.toLowerCase(),
         start: new Date(task.startTime),
         end: new Date(task.endTime),
         type: task.type,
-        subtasks:
-          task.subTasks?.map((st) => ({
-            id: st.id,
-            title: st.title,
-            startTime: new Date(st.startTime),
-            endTime: new Date(st.endTime),
-            description: st.description,
-          })) || [],
+        subtasks: task.subTasks?.map((st) => ({
+          id: st.id,
+          title: st.title,
+          description: st.description,
+          status: st.status.toLowerCase(),
+          startTime: st.startTime,
+          endTime: st.endTime
+        })) || [],
       }))
 
       setEvents(transformedEvents)
     } catch (error) {
       console.error("Error fetching events:", error)
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleEventClick = async (event) => {
     try {
       setIsLoading(true)
-      // Fetch full task details when clicking an event
-      const taskDetails = await getTaskDetail(event.id)
+      
 
-      // Transform the task details to match the expected format
-      const transformedTask = {
-        id: taskDetails.id,
-        title: taskDetails.title,
-        description: taskDetails.description,
-        priority: taskDetails.priority.toLowerCase(),
-        start: taskDetails.startTime,
-        end: taskDetails.endTime,
-        subtasks:
-          taskDetails.subTasks?.map((st) => ({
+      if (event.type === "SubTask" && event.parentId) {
+        const taskDetails = await getTaskDetail(event.parentId);
+        
+        const transformedTask = {
+          id: taskDetails.id,
+          title: taskDetails.title,
+          description: taskDetails.description,
+          priority: taskDetails.priority.toLowerCase(),
+          status: taskDetails.status.toLowerCase(),
+          start: taskDetails.startTime,
+          end: taskDetails.endTime,
+          subtasks: taskDetails.subTasks?.map((st) => ({
             id: st.id,
             title: st.title,
             startTime: st.startTime,
             endTime: st.endTime,
             description: st.description,
+            status: st.status.toLowerCase(),
           })) || [],
-      };
-      console.log('================================', transformedTask);
-
-      setSelectedEvent(transformedTask)
-      setIsModalOpen(true)
+          selectedSubtaskId: event.id 
+        };
+        
+        setSelectedEvent(transformedTask);
+      } else {
+        const taskDetails = await getTaskDetail(event.id);
+        
+        const transformedTask = {
+          id: taskDetails.id,
+          title: taskDetails.title,
+          description: taskDetails.description,
+          priority: taskDetails.priority.toLowerCase(),
+          status: taskDetails.status.toLowerCase(),
+          start: taskDetails.startTime,
+          end: taskDetails.endTime,
+          subtasks: taskDetails.subTasks?.map((st) => ({
+            id: st.id,
+            title: st.title,
+            startTime: st.startTime,
+            endTime: st.endTime,
+            description: st.description,
+            status: st.status.toLowerCase(),
+          })) || [],
+        };
+        
+        setSelectedEvent(transformedTask);
+      }
+      
+      setIsModalOpen(true);
     } catch (error) {
       console.error("Error loading task details:", error)
     } finally {
@@ -94,9 +119,9 @@ export default function CalendarPage() {
     setIsModalOpen(true)
   }
 
-  const handleEventSubmit = async (eventData) => {
+  const handleEventSubmit = async () => {
     try {
-      await fetchEvents() // Refresh events after submission
+      await fetchEvents() 
       setIsModalOpen(false)
       setSelectedEvent(null)
       setSelectedTime(null)
@@ -134,4 +159,3 @@ export default function CalendarPage() {
     </div>
   )
 }
-
