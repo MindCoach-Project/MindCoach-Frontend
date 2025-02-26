@@ -4,54 +4,113 @@ import { useState, useRef, useEffect } from "react";
 import { CalendarHeader } from "../components/Task";
 import { TimeGrid } from "../components/Task";
 import { EventModal } from "../components/Task";
-import { Plus } from "lucide-react";
-import { Button } from "../components/ui";
-import { PushNotificationManager } from "../components/Notification";
-import { scheduleLocalNotification } from "../components/Notification/PushNotificationManager"
-import { scheduleNotification } from "../utils";
-// Example events data matching the screenshot
-const initialEvents = [
-  {
-    id: "1",
-    title: "Check email",
-    start: new Date(2025, 2, 16, 21, 0),
-    end: new Date(2025, 2, 16, 21, 30),
-    type: "Reply client",
-  },
-  {
-    id: "2",
-    title: "Write documentation",
-    start: new Date(2025, 2, 16, 21, 30),
-    end: new Date(2025, 2, 16, 21, 50),
-    type: "Write docs",
-  },
-
-]
+import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(new Date())
-  const [view, setView] = useState("week")
-  const [events, setEvents] = useState(initialEvents)
+  const [view, setView] = useState("day")
+  const [events, setEvents] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [selectedTime, setSelectedTime] = useState(null)
-
+  const [isLoading, setIsLoading] = useState(false)
   const timeGridRef = useRef(null)
 
   useEffect(() => {
-    if (timeGridRef.current) {
-      const scrollToEightAM = 8 * 60 // 8 hours * 60px per hour
-      timeGridRef.current.scrollTop = scrollToEightAM
-    }
-  }, [])
+    fetchEvents()
+  }, [date, view])
 
-  const handleEventSubmit = (eventData) => {
-    if (selectedEvent) {
-      setEvents(events.map((event) => (event.id === selectedEvent.id ? { ...event, ...eventData } : event)))
-    } else {
-      setEvents([...events, eventData])
+  const fetchEvents = async () => {
+    try {
+      setIsLoading(true);
+      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date)
+      
+      // Transform API response to match the event format
+      const transformedEvents = tasks.map((task) => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        priority: task.priority.toLowerCase(),
+        status: task.status.toLowerCase(),
+        start: new Date(task.startTime),
+        end: new Date(task.endTime),
+        type: task.type,
+        subtasks: task.subTasks?.map((st) => ({
+          id: st.id,
+          title: st.title,
+          description: st.description,
+          status: st.status.toLowerCase(),
+          startTime: st.startTime,
+          endTime: st.endTime
+        })) || [],
+      }))
+
+      setEvents(transformedEvents)
+    } catch (error) {
+      console.error("Error fetching events:", error)
+    } finally {
+      setIsLoading(false);
     }
-    scheduleNotification(eventData)
+  }
+
+  const handleEventClick = async (event) => {
+    try {
+      setIsLoading(true)
+      
+
+      if (event.type === "SubTask" && event.parentId) {
+        const taskDetails = await getTaskDetail(event.parentId);
+        
+        const transformedTask = {
+          id: taskDetails.id,
+          title: taskDetails.title,
+          description: taskDetails.description,
+          priority: taskDetails.priority.toLowerCase(),
+          status: taskDetails.status.toLowerCase(),
+          start: taskDetails.startTime,
+          end: taskDetails.endTime,
+          subtasks: taskDetails.subTasks?.map((st) => ({
+            id: st.id,
+            title: st.title,
+            startTime: st.startTime,
+            endTime: st.endTime,
+            description: st.description,
+            status: st.status.toLowerCase(),
+          })) || [],
+          selectedSubtaskId: event.id 
+        };
+        
+        setSelectedEvent(transformedTask);
+      } else {
+        const taskDetails = await getTaskDetail(event.id);
+        
+        const transformedTask = {
+          id: taskDetails.id,
+          title: taskDetails.title,
+          description: taskDetails.description,
+          priority: taskDetails.priority.toLowerCase(),
+          status: taskDetails.status.toLowerCase(),
+          start: taskDetails.startTime,
+          end: taskDetails.endTime,
+          subtasks: taskDetails.subTasks?.map((st) => ({
+            id: st.id,
+            title: st.title,
+            startTime: st.startTime,
+            endTime: st.endTime,
+            description: st.description,
+            status: st.status.toLowerCase(),
+          })) || [],
+        };
+        
+        setSelectedEvent(transformedTask);
+      }
+      
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error loading task details:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleTimeClick = (time) => {
@@ -60,27 +119,19 @@ export default function CalendarPage() {
     setIsModalOpen(true)
   }
 
-  const handleEventClick = (event) => {
-    setSelectedEvent(event)
-    setSelectedTime(null)
-    setIsModalOpen(true)
-  }
-
-  const testNotification = () => {
-    const now = new Date()
-    const testNotificationTime = new Date(now.getTime() + 5000) // 5 seconds from now
-    scheduleLocalNotification(
-      9999,
-      "Test Notification",
-      "This is a test notification",
-      testNotificationTime.toISOString(),
-    )
-    console.log("Test notification scheduled for", testNotificationTime)
+  const handleEventSubmit = async () => {
+    try {
+      await fetchEvents() 
+      setIsModalOpen(false)
+      setSelectedEvent(null)
+      setSelectedTime(null)
+    } catch (error) {
+      console.error("Error handling event submission:", error)
+    }
   }
 
   return (
     <div className="flex flex-col h-screen">
-      <PushNotificationManager />
       <CalendarHeader date={date} view={view} onDateChange={setDate} onViewChange={setView} />
       <div ref={timeGridRef} className="flex-1 overflow-auto">
         <TimeGrid
@@ -91,31 +142,20 @@ export default function CalendarPage() {
           onEventClick={handleEventClick}
         />
       </div>
-      <Button className="fixed bottom-16 right-4 rounded-full shadow-lg" onClick={testNotification}>
-        Test Notification
-      </Button>
-      <Button
-        className="fixed bottom-4 right-4 rounded-full shadow-lg"
-        onClick={() => {
-          setSelectedEvent(null)
-          setSelectedTime(new Date())
-          setIsModalOpen(true)
-        }}
-      >
-        <Plus className="h-4 w-4" />
-      </Button>
-      <EventModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedEvent(null)
-          setSelectedTime(null)
-        }}
-        onSubmit={handleEventSubmit}
-        defaultValues={selectedEvent}
-        selectedTime={selectedTime}
-      />
+      {isModalOpen && (
+        <EventModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedEvent(null)
+            setSelectedTime(null)
+          }}
+          onSubmit={handleEventSubmit}
+          defaultValues={selectedEvent}
+          selectedTime={selectedTime}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   )
 }
-

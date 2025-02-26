@@ -8,7 +8,7 @@ function Default({ children }) {
         <Header />
         <div className="scrollbar-hide">{children}</div>
       </div>
-      <Navigation />
+      {/* <Navigation /> */}
     </div>
   );
 }

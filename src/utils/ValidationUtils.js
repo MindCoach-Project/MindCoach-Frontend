@@ -42,4 +42,6 @@ export const validateEmail = (email) => {
       confirmPassword: validateConfirmPassword(password, confirmPassword),
     };
   };
+
+
   

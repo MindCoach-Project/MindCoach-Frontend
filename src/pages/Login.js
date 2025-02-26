@@ -45,8 +45,8 @@ function Login() {
         JSON.stringify({ username, email, imageUrl })
       );
 
-      dispatch({ type: "SET_IS_LOGIN", payload: true });
-      dispatch({ type: "SET_USER", payload: { username, email, imageUrl } });
+      dispatch(actions.setIsLogin(true));
+      dispatch(actions.setUser({ username, email, imageUrl }));
 
       setToast({ type: "success", message: "Login successful!" });
       navigate(site_path.HOME);

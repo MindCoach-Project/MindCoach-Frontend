@@ -4,26 +4,49 @@ import { format, addDays, startOfWeek, isSameDay, isToday } from "date-fns";
 import { cn } from "../../libs/utils";
 
 export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
-  // Create array of hours from 0 to 23 (24-hour format)
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  // Get week days starting from Monday
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     addDays(startOfWeek(date, { weekStartsOn: 1 }), i)
   );
 
-  const getEventStyle = (event) => {
-    const typeColors = {
-      Report: "bg-orange-100 border-orange-200 text-orange-700",
-      "Reply client": "bg-green-100 border-green-200 text-green-700",
-      "Write docs": "bg-pink-100 border-pink-200 text-pink-700",
-      Meeting: "bg-blue-100 border-blue-200 text-blue-700",
-      default: "bg-gray-100 border-gray-200 text-gray-700",
-    };
-    return event.type && typeColors[event.type]
-      ? typeColors[event.type]
-      : typeColors.default;
+
+  const handleEventClick = (event) => {
+    if (event.type === "SubTask") {
+      onEventClick({
+        id: event.parentId,
+        selectedSubtaskId: event.id,
+        subtasks: processedEvents
+          .filter(e => e.parentId === event.parentId && e.type === "SubTask")
+      });
+    } else {
+      // For regular tasks
+      onEventClick(event);
+    }
   };
+
+  // Process events to include subtasks as separate events for display
+  const processedEvents = events.flatMap(event => {
+    const mainEvent = {
+      ...event,
+      isParent: event.subtasks && event.subtasks.length > 0
+    };
+    
+    // Convert subtasks to event format for rendering
+    const subtaskEvents = (event.subtasks || []).map(subtask => ({
+      id: subtask.id,
+      title: subtask.title,
+      description: subtask.description,
+      status: subtask.status.toLowerCase(),
+      start: new Date(subtask.startTime),
+      end: new Date(subtask.endTime),
+      type: "SubTask",
+      parentId: event.id,
+      parentTitle: event.title
+    }));
+    
+    return [mainEvent, ...subtaskEvents];
+  });
 
   const getEventPosition = (event) => {
     const startHour = new Date(event.start).getHours();
@@ -40,11 +63,100 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
     };
   };
 
+  const renderEvent = (event, dayIndex = null, isWeekView = false) => {
+    const { top, height } = getEventPosition(event);
+    const style = dayIndex !== null 
+      ? { left: `${(dayIndex * 100) / 7}%`, width: `${100 / 7}%`, top, height } 
+      : { top, height };
+
+    const priorityColors = {
+      high: "bg-red-200 text-red-700 border-red-300",
+      medium: "bg-yellow-200 text-yellow-700 border-yellow-300",
+      low: "bg-green-200 text-green-700 border-green-300",
+    };
+
+    const statusColors = {
+      todo: "bg-gray-100 text-gray-700 border-gray-300",
+      inprogress: "bg-blue-100 text-blue-700 border-blue-300",
+      done: "bg-green-100 text-green-700 border-green-300",
+    };
+
+    // Different styling for week view vs day view
+    const baseClasses = cn(
+      "absolute rounded-lg border p-2 cursor-pointer transition-colors",
+      event.type === "SubTask" 
+        ? (isWeekView 
+          ? "ml-2 w-[calc(100%-0.5rem)] border-dashed" 
+          : "ml-4 w-[calc(100%-1rem)] border-dashed")
+        : "",
+      isWeekView 
+        ? "bg-sky-400 hover:bg-sky-600 text-white" 
+        : cn(
+            "bg-sky-50 hover:bg-sky-100", 
+            priorityColors[event.priority?.toLowerCase() || "medium"]
+          )
+    );
+    
+    return (
+      <div
+        key={event.id}
+        className={baseClasses}
+        style={style}
+        onClick={() => handleEventClick(event)}
+      >
+        <div className="space-y-1">
+          {/* Title */}
+          <div className="flex items-center justify-between gap-1">
+            <h3 className={cn(
+              "font-medium truncate flex-1",
+              isWeekView ? "text-xs" : "text-sm"
+            )}>
+              {event.type === "SubTask" && "↳ "}
+              {event.title}
+            </h3>
+            
+            {!isWeekView && (
+              <span
+                className={cn(
+                  "px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap",
+                  priorityColors[event.priority?.toLowerCase() || "medium"]
+                )}
+              >
+                {event.priority}
+              </span>
+            )}
+          </div>
+
+          {/* Time and Status */}
+          <div className="flex items-center justify-between gap-1">
+            <span className={cn(
+              "text-xs",
+              isWeekView ? "text-white" : "text-muted-foreground"
+            )}>
+              {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}
+            </span>
+            
+            {!isWeekView && event.status && (
+              <span
+                className={cn(
+                  "px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap",
+                  statusColors[event.status?.toLowerCase() || "todo"]
+                )}
+              >
+                {event.status}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderWeekView = () => (
     <div className="flex flex-1 overflow-auto">
       {/* Time column */}
-      <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-10">
-        <div className="h-12 border-b pt-[40px]" /> {/* Header spacer */}
+      <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
+        <div className="h-12 border-b pt-[40px]" />
         {hours.map((hour) => (
           <div
             key={hour}
@@ -69,8 +181,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
               <div
                 className={cn(
                   "text-sm font-medium",
-                  isSameDay(day, new Date()) && "text-primary",
-                  isToday(day) && "text-orange"
+                  isToday(day) && "text-primary"
                 )}
               >
                 {format(day, "EEE")}
@@ -78,7 +189,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
               <div
                 className={cn(
                   "text-sm text-muted-foreground",
-                  isToday(day) && "text-orange"
+                  isToday(day) && "text-primary"
                 )}
               >
                 {format(day, "d")}
@@ -94,7 +205,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
             {weekDays.map((day) => (
               <div
                 key={day.toString()}
-                className={cn("border-r", isToday(day) && "")}
+                className={cn("border-r", isToday(day) && "bg-slate-50")}
               >
                 {hours.map((hour) => (
                   <div
@@ -116,33 +227,14 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
             <div
               key={day.toString()}
               className="absolute top-0 bottom-0"
-              style={{ left: `${(dayIndex * 100) / 7}%`, width: `${100 / 7}%` }}
+              style={{
+                left: `${(dayIndex * 100) / 7}%`,
+                width: `${100 / 7}%`,
+              }}
             >
-              {events
+              {processedEvents
                 .filter((event) => isSameDay(new Date(event.start), day))
-                .map((event) => {
-                  const { top, height } = getEventPosition(event);
-
-                  return (
-                    <div
-                      key={event.id}
-                      className={cn(
-                        "absolute left-1 right-1 rounded-md border p-2 cursor-pointer",
-                        getEventStyle(event)
-                      )}
-                      style={{
-                        top,
-                        height,
-                        minHeight: "20px",
-                      }}
-                      onClick={() => onEventClick(event)}
-                    >
-                      <div className="text-xs font-medium truncate">
-                        {event.title}
-                      </div>
-                    </div>
-                  );
-                })}
+                .map((event) => renderEvent(event, dayIndex, true))}
             </div>
           ))}
         </div>
@@ -152,7 +244,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
 
   const renderDayView = () => (
     <div className="flex flex-1 overflow-auto">
-      <div className="flex-shrink-0 w-20 border-r sticky left-0 bg-background z-10">
+      <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
         {hours.map((hour) => (
           <div
             key={hour}
@@ -175,35 +267,11 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
               }}
             />
           ))}
-          {events
+          
+          {/* Day view events */}
+          {processedEvents
             .filter((event) => isSameDay(new Date(event.start), date))
-            .map((event) => {
-              const { top, height } = getEventPosition(event);
-
-              return (
-                <div
-                  key={event.id}
-                  className={cn(
-                    "absolute left-1 right-1 rounded-md border p-2 cursor-pointer",
-                    getEventStyle(event)
-                  )}
-                  style={{
-                    top,
-                    height,
-                    minHeight: "20px",
-                  }}
-                  onClick={() => onEventClick(event)}
-                >
-                  <div className="text-sm font-medium truncate">
-                    {event.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {format(new Date(event.start), "HH:mm")} -{" "}
-                    {format(new Date(event.end), "HH:mm")}
-                  </div>
-                </div>
-              );
-            })}
+            .map((event) => renderEvent(event, null, false))}
         </div>
       </div>
     </div>
@@ -213,8 +281,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="flex-1 overflow-auto">
         <div className="min-h-[720px] mt-10">
-          {" "}
-          {view === "week" ? renderWeekView() : renderDayView()}
+          {view === "day" ? renderDayView() : renderWeekView()}
         </div>
       </div>
     </div>
