@@ -2,28 +2,32 @@ import { useEffect, useState } from "react";
 import { Logo } from "../components/ui";
 import { Link } from "react-router-dom";
 import { FaUser, FaBell } from "react-icons/fa";
-
 function Header() {
   const [user, setUser] = useState(null);
+  const defaultImage =  "https://cdn-icons-png.flaticon.com/512/8792/8792047.png";
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Lấy thông tin người dùng từ localStorage
+      setUser(JSON.parse(storedUser)); 
     }
   }, []);
+
+  const isValidImageUrl = (url) => {
+    return url && (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.jpeg'));
+  };
 
   return (
     <div className="flex justify-between z-50">
       <Logo width={120} />
       <div className="flex items-center gap-12">
         <Link to="/notification">
-          <FaBell size={24} />
+          <FaBell size={24} style={{ color: 'orange' }} />
         </Link>
         <Link to="/profile">
           {user ? (
             <img
-              src={user.imageUrl}
+              src={isValidImageUrl(user.imageUrl) ? user.imageUrl : defaultImage}
               alt="Profile"
               className="w-10 h-10 rounded-full border border-1 border-brown"
             />

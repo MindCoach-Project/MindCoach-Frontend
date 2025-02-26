@@ -5,7 +5,7 @@ export default function Card({ icon, title, onClick, className = "" }) {
         onClick={onClick}
       >
         <div className="mb-2 flex justify-center">{icon}</div>
-        <h3 className="text-lg font-semibold text-center">{title}</h3>
+        <h3 className="text-lg font-medium text-center">{title}</h3>
       </div>
     );
   }
