@@ -13,7 +13,7 @@ function Navigation() {
     { id: 1, to: "/home", icon: FaHome, label: "Home" },
     { id: 2, to: "/tasks", icon: FaClipboardList, label: "Task" },
     { id: 3, to: "/reminder", icon: FaBell, label: "Reminder" },
-    { id: 4, to: "/complete", icon: FaCheckCircle, label: "Complete" },
+    { id: 4, to: "/taskstatus", icon: FaCheckCircle, label: "Complete" },
     { id: 5, to: "/profile", icon: FaUser, label: "Profile" },
   ];
 

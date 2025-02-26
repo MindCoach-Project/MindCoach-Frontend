@@ -8,7 +8,7 @@ export const site_path = {
     HOME: '/home',
     TASKS: 'tasks',
     PROFILE: '/profile',
-  
+    TASKSTATUS: '/taskstatus',
     LOGIN: '/login',
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',

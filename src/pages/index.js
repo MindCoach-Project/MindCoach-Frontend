@@ -4,3 +4,4 @@ export { default as Intro } from "./Intro";
 export { default as Register } from "./Register";
 export { default as ListTasks } from "./ListTasks";
 export { default as Profile } from "./Profile";
+export { default as TaskStatusPage } from "./TaskStatusPage";
