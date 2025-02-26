@@ -1,4 +1,4 @@
-import { Home, Intro, ListTasks, Profile } from "../pages";
+import { Home, Intro, ListTasks, Profile, TaskStatusPage } from "../pages";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
@@ -25,6 +25,12 @@ let privateRoutes = [
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
   }, 
+  {
+    path: site_path.TASKSTATUS,
+    component:TaskStatusPage,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
   {
     path: site_path.PROFILE,
     component:Profile ,

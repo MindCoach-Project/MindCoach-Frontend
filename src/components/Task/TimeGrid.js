@@ -76,9 +76,9 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
     };
 
     const statusColors = {
-      todo: "bg-gray-100 text-gray-700 border-gray-300",
-      inprogress: "bg-blue-100 text-blue-700 border-blue-300",
-      done: "bg-green-100 text-green-700 border-green-300",
+      todo: "bg-gray-200 text-gray-700 border-gray-300",
+      inprogress: "bg-blue-200 text-blue-700 border-blue-300",
+      done: "bg-green-200 text-green-700 border-green-300",
     };
 
     // Different styling for week view vs day view
