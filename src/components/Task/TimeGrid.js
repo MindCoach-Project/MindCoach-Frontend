@@ -153,7 +153,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
   };
 
   const renderWeekView = () => (
-    <div className="flex flex-1 overflow-auto">
+    <div className="flex flex-1 overflow-auto scrollbar-hide">
       {/* Time column */}
       <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
         <div className="h-12 border-b pt-[40px]" />
@@ -243,7 +243,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
   );
 
   const renderDayView = () => (
-    <div className="flex flex-1 overflow-auto">
+    <div className="flex flex-1 overflow-auto scrollbar-hide">
       <div className="flex-shrink-0 w-10 border-r sticky left-0 bg-background z-10">
         {hours.map((hour) => (
           <div
@@ -278,9 +278,9 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
   );
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden scrollbar-hide">
       <div className="flex-1 overflow-auto">
-        <div className="min-h-[720px] mt-10">
+        <div className=" overflow-y-auto max-h-[80vh] scrollbar-hide mt-10">
           {view === "day" ? renderDayView() : renderWeekView()}
         </div>
       </div>

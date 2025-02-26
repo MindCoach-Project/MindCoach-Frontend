@@ -1,31 +1,29 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { CalendarHeader } from "../components/Task";
-import { TimeGrid } from "../components/Task";
-import { EventModal } from "../components/Task";
+import { CalendarHeader, TimeGrid, EventModal } from "../components/Task";
 import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
+import { IconPlus } from "../components/ui"; 
 
 export default function CalendarPage() {
-  const [date, setDate] = useState(new Date())
-  const [view, setView] = useState("day")
-  const [events, setEvents] = useState([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [selectedTime, setSelectedTime] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const timeGridRef = useRef(null)
+  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState("day");
+  const [events, setEvents] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const timeGridRef = useRef(null);
 
   useEffect(() => {
-    fetchEvents()
-  }, [date, view])
+    fetchEvents();
+  }, [date, view]);
 
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date)
-      
-      // Transform API response to match the event format
+      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
+
       const transformedEvents = tasks.map((task) => ({
         id: task.id,
         title: task.title,
@@ -41,26 +39,25 @@ export default function CalendarPage() {
           description: st.description,
           status: st.status.toLowerCase(),
           startTime: st.startTime,
-          endTime: st.endTime
+          endTime: st.endTime,
         })) || [],
-      }))
+      }));
 
-      setEvents(transformedEvents)
+      setEvents(transformedEvents);
     } catch (error) {
-      console.error("Error fetching events:", error)
+      console.error("Error fetching events:", error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handleEventClick = async (event) => {
     try {
-      setIsLoading(true)
-      
+      setIsLoading(true);
 
       if (event.type === "SubTask" && event.parentId) {
         const taskDetails = await getTaskDetail(event.parentId);
-        
+
         const transformedTask = {
           id: taskDetails.id,
           title: taskDetails.title,
@@ -77,13 +74,13 @@ export default function CalendarPage() {
             description: st.description,
             status: st.status.toLowerCase(),
           })) || [],
-          selectedSubtaskId: event.id 
+          selectedSubtaskId: event.id,
         };
-        
+
         setSelectedEvent(transformedTask);
       } else {
         const taskDetails = await getTaskDetail(event.id);
-        
+
         const transformedTask = {
           id: taskDetails.id,
           title: taskDetails.title,
@@ -101,54 +98,60 @@ export default function CalendarPage() {
             status: st.status.toLowerCase(),
           })) || [],
         };
-        
+
         setSelectedEvent(transformedTask);
       }
-      
+
       setIsModalOpen(true);
     } catch (error) {
-      console.error("Error loading task details:", error)
+      console.error("Error loading task details:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleTimeClick = (time) => {
-    setSelectedTime(time)
-    setSelectedEvent(null)
-    setIsModalOpen(true)
-  }
+    setSelectedTime(time);
+    setSelectedEvent(null);
+    setIsModalOpen(true);
+  };
 
   const handleEventSubmit = async () => {
     try {
-      await fetchEvents() 
-      setIsModalOpen(false)
-      setSelectedEvent(null)
-      setSelectedTime(null)
+      await fetchEvents();
+      setIsModalOpen(false);
+      setSelectedEvent(null);
+      setSelectedTime(null);
     } catch (error) {
-      console.error("Error handling event submission:", error)
+      console.error("Error handling event submission:", error);
     }
-  }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    setSelectedEvent(null);
+    setSelectedTime(null);
+  };
 
   return (
     <div className="flex flex-col h-full">
       <CalendarHeader date={date} view={view} onDateChange={setDate} onViewChange={setView} />
       <div ref={timeGridRef} className="flex-1 overflow-auto">
-        <TimeGrid
-          date={date}
-          view={view}
-          events={events}
-          onTimeClick={handleTimeClick}
-          onEventClick={handleEventClick}
-        />
+        <TimeGrid date={date} view={view} events={events} onTimeClick={handleTimeClick} onEventClick={handleEventClick} />
       </div>
+
+      {/* Nút IconPlus để mở modal */}
+      <div className="absolute bottom-20 right-6">
+        <IconPlus onCalendarClick={openModal} onEmotionClick={() => console.log("Emotion Clicked")} />
+      </div>
+
       {isModalOpen && (
         <EventModal
           isOpen={isModalOpen}
           onClose={() => {
-            setIsModalOpen(false)
-            setSelectedEvent(null)
-            setSelectedTime(null)
+            setIsModalOpen(false);
+            setSelectedEvent(null);
+            setSelectedTime(null);
           }}
           onSubmit={handleEventSubmit}
           defaultValues={selectedEvent}
@@ -157,5 +160,5 @@ export default function CalendarPage() {
         />
       )}
     </div>
-  )
+  );
 }
