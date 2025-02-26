@@ -131,7 +131,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <CalendarHeader date={date} view={view} onDateChange={setDate} onViewChange={setView} />
       <div ref={timeGridRef} className="flex-1 overflow-auto">
         <TimeGrid

@@ -5,4 +5,5 @@ export { deleteSubTask } from "./deleteSubtask";
 export { getTaskDetail } from "./getTaskDetail";
 export { getTasksByDay } from "./getTaskByDay";
 export { getTasksByWeek } from "./getTaskByWeek";
+export { getTaskUpcoming } from "./getTaskUpcoming";
 
