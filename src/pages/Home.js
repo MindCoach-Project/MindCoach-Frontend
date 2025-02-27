@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScheduleEvent, EmotionPicker, Template, Relaxation } from "../components";
+import { ScheduleEvent, EmotionPicker, TemplateSection, Relaxation } from "../components";
 import { IconPlus } from "../components/ui";
 import { getTaskUpcoming } from "../api/task/getTaskUpcoming";
 import { EventModal } from "../components/Task";
@@ -37,9 +37,8 @@ function Home() {
     fetchTasks();
   }, []);
 
-  // Modal handlers
   const openModal = () => {
-    setSelectedTask(null); // Reset selected task for creating new task
+    setSelectedTask(null); 
     setIsModalOpen(true);
   };
 
@@ -48,16 +47,10 @@ function Home() {
     setSelectedTask(null);
   };
 
-  const handleTaskClick = (task) => {
-    setSelectedTask(task);
-    setIsModalOpen(true);
-  };
-
   const handleTaskUpdate = async () => {
     setIsLoading(true);
     try {
-      // Will be handled by the EventModal's internal submit function
-      await fetchTasks(); // Refresh the task list after update
+      await fetchTasks(); 
     } catch (error) {
       console.error("Error updating tasks:", error);
     } finally {
@@ -68,7 +61,7 @@ function Home() {
   return (
     <div className="flex flex-col gap-12 overflow-y-auto max-h-[80vh] scrollbar-hide">
       <p className="text-20 text-brown">{dateTime}</p>
-      <div className="rounded-lg p-3 border border-orange flex flex-col gap-12">
+      <div className="rounded-md p-3 border border-orange flex flex-col gap-12">
         {tasks.length > 0 ? (
           tasks.map((task) => (
             <ScheduleEvent
@@ -82,7 +75,6 @@ function Home() {
                 minute: "2-digit",
               })}
               title={task.title}
-              onClick={() => handleTaskClick(task)}
             />
           ))
         ) : (
@@ -91,10 +83,10 @@ function Home() {
       </div>
 
       <EmotionPicker />
-      <Template />
+      <TemplateSection />
       <Relaxation />
       
-      {/* Floating action button */}
+      
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
@@ -102,7 +94,6 @@ function Home() {
         />
       </div>
 
-      {/* Event Modal */}
       <EventModal
         isOpen={isModalOpen}
         onClose={handleModalClose}

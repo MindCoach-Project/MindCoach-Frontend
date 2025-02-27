@@ -5,3 +5,7 @@ export { default as Register } from "./Register";
 export { default as ListTasks } from "./ListTasks";
 export { default as Profile } from "./Profile";
 export { default as TaskStatusPage } from "./TaskStatusPage";
+export { default as WorkTemplate } from "./WorkTemplate";
+export { default as HouseholdTemplate } from "./HouseholdTemplate";
+export { default as SportTemplate } from "./SportTemplate";
+export { default as RelaxTemplate } from "./RelaxTemplate";

@@ -1,4 +1,4 @@
-import { Home, Intro, ListTasks, Profile, TaskStatusPage } from "../pages";
+import { Home, Intro, ListTasks, Profile, TaskStatusPage, WorkTemplate, HouseholdTemplate, SportTemplate, RelaxTemplate } from "../pages";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
@@ -35,7 +35,32 @@ let privateRoutes = [
     path: site_path.PROFILE,
     component:Profile ,
     layout: DefaultLayout,
-  }
+    error: AthUtils.handleAuthorization,
+  }, 
+  {
+    path: site_path.TEMPLATE_WORK,
+    component: WorkTemplate,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
+  {
+    path: site_path.TEMPLATE_HOUSEHOLD,
+    component: HouseholdTemplate,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
+  {
+    path: site_path.TEMPLATE_SPORT,
+    component: SportTemplate,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
+  {
+    path: site_path.TEMPLATE_RELAX,
+    component: RelaxTemplate,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
 ];
 
 files.keys().forEach((fileName) => {

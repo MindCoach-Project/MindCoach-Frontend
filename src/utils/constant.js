@@ -13,4 +13,10 @@ export const site_path = {
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',
     LOG_OUT: '/logout',
+
+     // Task Templates
+     TEMPLATE_WORK: '/template/work',
+     TEMPLATE_HOUSEHOLD: '/template/household',
+     TEMPLATE_SPORT: '/template/sport',
+     TEMPLATE_RELAX: '/template/relax',
 };

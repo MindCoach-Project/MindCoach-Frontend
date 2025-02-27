@@ -1,48 +1,31 @@
-// import React from "react";
-
-// const Button = ({ children, onClick, className = "", ...props }) => {
-//   const baseStyles =
-//     "px-[24px] py-[12px] min-w-[200px] bg-aqua rounded-full font-light text-20 text-white";
-//   return (
-//     <button
-//       onClick={onClick}
-//       className={`${baseStyles} ${className} `}
-//       {...props}
-//     >
-//       {children}
-//     </button>
-//   );
-// };
-
-// export default Button;
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
 import { cn } from "../../libs/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-full text-sm font-medium transition-all duration-200 ease-in-out  focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-aqua text-white hover:bg-aqua",
+          "bg-[#03C0B4] text-white hover:bg-[#02A89E] focus:ring-[#03C0B4] active:bg-[#028E89]",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 active:bg-red-700",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        noborder:
-        "border-transparent",
+          "border border-gray-300 bg-white text-gray-800 shadow-sm hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-400 active:bg-gray-200 active:shadow-md",
+        noborder: "border-transparent bg-transparent text-gray-800 hover:bg-gray-100",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-orange-500 text-white shadow-orange-500/40 border border-orange-500 hover:bg-orange-600 focus:ring-orange-500 active:bg-orange-700 active:shadow-md",
+        ghost:
+          "text-gray-700 hover:bg-gray-200 focus:ring-gray-300 active:bg-gray-300 active:shadow-md",
+        link: "text-[#03C0B4] hover:underline focus:ring-[#03C0B4]",
       },
       size: {
         default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-full px-3 text-base",
-        lg: "h-10 w-1/2 rounded-full px-8 text-lg",
-        icon: "h-9 w-9",
+        sm: "w-1/4 px-3 py-2 text-base",
+        lg: "h-10 w-1/2 px-8 text-lg",
+        icon: "h-10 w-10 flex items-center justify-center",
       },
     },
     defaultVariants: {
@@ -50,7 +33,8 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
+
 
 const Button = React.forwardRef(
   ({ className, variant, size, asChild = false, ...props }, ref) => {

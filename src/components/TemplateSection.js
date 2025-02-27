@@ -1,37 +1,37 @@
-import { Card } from "../components/ui";
+import { TaskTemplateCard } from "./ui";
 import { useNavigate } from "react-router-dom";
-import { Users, Briefcase, Plane, Bike } from "lucide-react";
-
-function Template() {
+import { Home, Briefcase, Coffee, Bike } from "lucide-react";
+import { site_path } from "../utils";
+function TemplateSection() {
   const navigate = useNavigate();
 
   const templates = [
     {
       id: 1,
-      title: "Family",
-      icon: <Users size={32} />,
-      path: "/template/family",
-      className: "bg-blue-200 border-blue-400 hover:bg-blue-400",
-    },
-    {
-      id: 2,
       title: "Work",
       icon: <Briefcase size={32} />,
-      path: "/template/work",
+      path: site_path.TEMPLATE_WORK,
       className: "bg-yellow-200 border-yellow-400 hover:bg-yellow-400",
     },
     {
+      id: 2,
+      title: "Household",
+      icon: <Home size={32} />,
+      path: site_path.TEMPLATE_HOUSEHOLD,
+      className: "bg-blue-200 border-blue-400 hover:bg-blue-400",
+    },
+    {
       id: 3,
-      title: "Travel",
-      icon: <Plane size={32} />,
-      path: "/template/travel",
+      title: "Sport",
+      icon: <Bike size={32} />,
+      path: site_path.TEMPLATE_SPORT,
       className: "bg-green-200 border-green-400 hover:bg-green-400",
     },
     {
       id: 4,
-      title: "Activity",
-      icon: <Bike size={32} />,
-      path: "/template/activity",
+      title: "Relax",
+      icon: <Coffee size={32} />,
+      path: site_path.TEMPLATE_RELAX,
       className: "bg-purple-200 border-purple-400 hover:bg-purple-400",
     },
   ];
@@ -43,7 +43,7 @@ function Template() {
       </h2>
       <div className="grid grid-cols-2 gap-4">
         {templates.map((item) => (
-          <Card
+          <TaskTemplateCard
             key={item.id}
             icon={item.icon}
             title={item.title}
@@ -56,4 +56,4 @@ function Template() {
   );
 }
 
-export default Template;
+export default TemplateSection;

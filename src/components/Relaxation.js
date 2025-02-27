@@ -10,12 +10,12 @@ const Relaxation = () => {
   return (
     <div className="flex flex-col gap-6">
       <h2 className="text-20 font-regular text-brown text-center">Relaxation</h2>
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-4">
         {relaxationItems.map((item) => (
           <Link
             key={item.title}
             to={item.link}
-            className="flex flex-col items-center p-4 rounded-lg min-w-[130px]"
+            className="w-1/3 flex flex-col items-center p-4 rounded-lg"
             style={{ backgroundColor: item.bgColor }}
           >
             <img src={item.icon} alt={item.title} className="w-16 h-16 mb-2" />

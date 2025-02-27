@@ -68,7 +68,10 @@ const config = {
         xl: "2", 
       },
       backgroundColors: {
-        orange: "rgba(245, 139, 16, 1)",
+        orange: "rgba(245, 139, 16, 1)", 
+        orange500: "rgba(245, 139, 16, 1)", 
+        orange600: "rgba(234, 88, 12, 1)", 
+        orange700: "rgba(196, 65, 12, 1)", 
         red100: "rgba(138, 2, 7, 1)",
         red90: "rgba(138, 2, 7, 0.9)",
         white90: "rgba(255, 255, 255, 0.9)",
