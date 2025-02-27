@@ -1,7 +1,7 @@
 export { default as Logo } from "./Logo";
 export { default as PageTitle } from "./PageTitle";
 export { default as Popup } from "./Popup";
-export { default as Card } from "./Card";
+export { default as TaskTemplateCard } from "./TaskTemplateCard";
 export { default as IconPlus } from "./IconPlus";
 export { default as NavItem } from "./NavItem";
 

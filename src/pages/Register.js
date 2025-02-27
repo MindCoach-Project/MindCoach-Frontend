@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/";
 import { site_path } from "../utils";
 import { validateRegisterForm } from "../utils";
@@ -24,7 +24,7 @@ function Register() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate(site_path.HOME); 
+      navigate(site_path.HOME);
     }
   }, []);
 
@@ -105,6 +105,12 @@ function Register() {
           </Button>
         </div>
       </form>
+      <p className="text-16 text-gray-700">
+        Already have an account?{" "}
+        <Link to="/login" className="text-orange">
+          Sign In
+        </Link>
+      </p>
       {toast && <ToastMessage type={toast.type} message={toast.message} />}
     </div>
   );

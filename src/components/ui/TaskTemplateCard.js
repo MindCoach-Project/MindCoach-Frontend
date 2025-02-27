@@ -1,4 +1,4 @@
-export default function Card({ icon, title, onClick, className = "" }) {
+export default function TaskTemplateCard ({ icon, title, onClick, className = "" }) {
     return (
       <div
         className={`${className} flex flex-col items-center justify-center border rounded-lg p-4 shadow-md cursor-pointer transition`}

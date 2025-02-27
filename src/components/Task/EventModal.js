@@ -37,6 +37,7 @@ export function EventModal({
   selectedTime,
   isLoading,
 }) {
+
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
