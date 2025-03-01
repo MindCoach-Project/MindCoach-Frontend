@@ -1,5 +1,9 @@
 {
   "appId": "io.ionic.starter",
   "appName": "MindCoach",
-  "webDir": "build"
+  "webDir": "build",
+  "android": {
+    "allowMixedContent": true
+  }
+
 }

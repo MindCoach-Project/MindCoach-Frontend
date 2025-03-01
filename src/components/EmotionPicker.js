@@ -25,7 +25,7 @@ export default function EmotionPicker() {
           return (
             <div
               key={emotion.id}
-              className={`flex flex-col items-center w-[66px] h-[66px] p-2 rounded-full cursor-pointer relative 
+              className={`flex flex-col items-center w-[56px] h-[56px] p-2 rounded-full cursor-pointer relative 
                 transition-all duration-300
                 ${isSelected ? "bg-opacity-100 bg-gray-100 border border-orange scale-108" : "bg-opacity-50 bg-gray-200"}`}
               onClick={() => {
@@ -36,7 +36,7 @@ export default function EmotionPicker() {
               <div className={`${emotion.color} ${isSelected ? "opacity-100" : "opacity-70"}`}>
                 {emotion.icon}
               </div>
-              <span className={`text-sm ${isSelected ? "font-medium" : "text-gray-600"}`}>
+              <span className={`text-12 ${isSelected ? "font-medium" : "text-gray-600"}`}>
                 {emotion.name}
               </span>
             </div>
