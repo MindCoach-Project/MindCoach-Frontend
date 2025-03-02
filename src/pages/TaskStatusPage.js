@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { getTasksByDay, getTaskDetail } from "../api";
+import { getTasksByDay, getTaskDetail } from "../api/task";
 import { EventModal } from "../components/Task";
 import { IconPlus } from "../components/ui";
 
@@ -93,7 +93,7 @@ const TaskStatusPage = () => {
   };
 
   return (
-    <div className="p-4">
+    <>
       <div className="flex justify-between items-center mb-4">
         <button onClick={() => changeDate(-1)}>❮</button>
         <p className="text-brown text-18">{date.format("dddd, DD MMM YYYY")}</p>
@@ -122,7 +122,7 @@ const TaskStatusPage = () => {
         })}
       </div>
 
-      <div className="overflow-y-auto max-h-[60vh] space-y-4 scrollbar-hide">
+      <div className="overflow-y-auto max-h-[64vh] space-y-4 scrollbar-hide">
         {tasks.map((task, index) => (
           <div
             key={task.id}
@@ -162,7 +162,7 @@ const TaskStatusPage = () => {
         defaultValues={selectedTask}
         isLoading={isLoading}
       />
-    </div>
+    </>
   );
 };
 

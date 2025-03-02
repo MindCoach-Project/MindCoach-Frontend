@@ -37,6 +37,8 @@ function Login() {
 
     try {
       const { data } = await loginUser(formData);
+      setToast({ type: "success", message: "Login successful!" });
+
       const { token, username, email, imageUrl } = data;
 
       localStorage.setItem("token", token);
@@ -48,8 +50,7 @@ function Login() {
       dispatch(actions.setIsLogin(true));
       dispatch(actions.setUser({ username, email, imageUrl }));
 
-      setToast({ type: "success", message: "Login successful!" });
-      navigate(site_path.HOME);
+      setTimeout(() => navigate(site_path.HOME), 1000);
     } catch (error) {
       const errorMessage = "Invalid email or password.";
       setErrors({ email: errorMessage, password: errorMessage });
@@ -58,7 +59,7 @@ function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center text-center gap-6">
-      <Logo />
+      <Logo width={220} />
       <PageTitle title="Sign In" />
       <form className="w-full flex flex-col gap-6" onSubmit={handleLogin}>
         <Input
