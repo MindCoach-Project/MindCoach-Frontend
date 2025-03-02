@@ -61,7 +61,7 @@ function Home() {
   return (
     <div className="flex flex-col gap-12 overflow-y-auto max-h-[80vh] scrollbar-hide">
       <p className="text-20 text-brown">{dateTime}</p>
-      <div className="rounded-md p-3 border border-orange flex flex-col gap-12">
+      <div className="rounded-md p-3 border border-orange flex flex-col gap-6">
         {tasks.length > 0 ? (
           tasks.map((task) => (
             <ScheduleEvent

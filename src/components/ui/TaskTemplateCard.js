@@ -5,7 +5,7 @@ export default function TaskTemplateCard ({ icon, title, onClick, className = ""
         onClick={onClick}
       >
         <div className="mb-2 flex justify-center">{icon}</div>
-        <h3 className="text-lg font-medium text-center">{title}</h3>
+        <h3 className="text-16 font-medium text-center">{title}</h3>
       </div>
     );
   }

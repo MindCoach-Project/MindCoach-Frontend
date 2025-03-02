@@ -15,11 +15,11 @@ const Relaxation = () => {
           <Link
             key={item.title}
             to={item.link}
-            className="w-1/3 flex flex-col items-center p-4 rounded-lg"
+            className="w-1/3 flex flex-col items-center p-2 rounded-lg"
             style={{ backgroundColor: item.bgColor }}
           >
             <img src={item.icon} alt={item.title} className="w-16 h-16 mb-2" />
-            <span className="text-lg font-medium text-center">{item.title}</span>
+            <span className="text-16 font-medium text-center">{item.title}</span>
           </Link>
         ))}
       </div>
