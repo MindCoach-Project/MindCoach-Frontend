@@ -17,13 +17,18 @@ function CalendarHeader({ date, view, onDateChange, onViewChange }) {
   };
 
   return (
-    <div className="fixed flex justify-between items-center border-b z-20">
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">{format(date, view === "day" ? "EEEE, dd MMMM" : "MMMM yyyy")}</h2>
+    <div className="fixed w-full flex flex-row justify-between items-center z-20">
+      {/* Section 1 */}
+      <div className="flex items-center">
+        <h2 className="text-18 font-semibold text-brown">
+          {format(date, view === "day" ? "EEEE, dd MMMM" : "MMMM yyyy")}
+        </h2>
       </div>
-      <div className="flex items-center gap-2">
+
+      {/* Section 2 */}
+      <div className="flex items-center gap-2 mr-10">
         <Button variant="outline" size="icon" onClick={() => navigateDate("prev")}>
-          <ChevronLeft className="h-3 w-3" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
         <Select value={view} onValueChange={(v) => onViewChange(v)}>
           <SelectTrigger className="w-[100px]">
@@ -35,7 +40,7 @@ function CalendarHeader({ date, view, onDateChange, onViewChange }) {
           </SelectContent>
         </Select>
         <Button variant="outline" size="icon" onClick={() => navigateDate("next")}>
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
     </div>

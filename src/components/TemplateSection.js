@@ -41,7 +41,7 @@ function TemplateSection() {
       <h2 className="text-20 font-regular text-brown text-center">
         Choose a template
       </h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-12">
         {templates.map((item) => (
           <TaskTemplateCard
             key={item.id}

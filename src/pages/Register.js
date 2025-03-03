@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../api/";
+import { registerUser } from "../api/auth";
 import { site_path } from "../utils";
 import { validateRegisterForm } from "../utils";
 import { Logo, PageTitle, Input, Button } from "../components/ui";
@@ -55,8 +55,8 @@ function Register() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center gap-24">
-      <Logo />
+    <div className="flex flex-col items-center justify-center text-center gap-6">
+      <Logo width={220} />
       <PageTitle title="Sign Up" />
       <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
         <Input
@@ -73,7 +73,7 @@ function Register() {
           id="email"
           name="email"
           label="Email"
-          type="email"
+          type="text"
           placeholder="Enter your email"
           value={formData.email}
           onChange={handleChange}

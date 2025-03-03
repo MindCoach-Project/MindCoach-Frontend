@@ -18,7 +18,7 @@ function Header() {
   };
 
   return (
-    <div className="flex justify-between z-50">
+    <div className="flex justify-between z-50 mt-12">
       <Logo width={120} />
       <div className="flex items-center gap-12">
         <Link to="/notification">
