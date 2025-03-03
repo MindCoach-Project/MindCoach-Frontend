@@ -29,9 +29,14 @@ const TaskStatusChart = ({ data }) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="To Do" stackId="a" fill="#ffbf69" />
-              <Bar dataKey="In Progress" stackId="a" fill="#cbf3f0" />
-              <Bar dataKey="Done" stackId="a" fill="#2ec4b6" />
+              <Bar dataKey="Done" stackId="a" fill="#962DFF" barSize={24} />
+              <Bar
+                dataKey="In Progress"
+                stackId="a"
+                fill="#C893FD"
+                barSize={24}
+              />
+              <Bar dataKey="To Do" stackId="a" fill="#E0C6FD" barSize={24} />
             </BarChart>
           </ResponsiveContainer>
         </div>

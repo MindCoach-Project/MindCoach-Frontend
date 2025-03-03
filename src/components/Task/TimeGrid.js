@@ -160,7 +160,7 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
         {hours.map((hour) => (
           <div
             key={hour}
-            className="h-[60px] border-b text-xs text-muted-foreground pl-2"
+            className="h-[60px] border-b text-xs text-muted-foreground"
           >
             {`${hour.toString().padStart(2, "0")}:00`}
           </div>

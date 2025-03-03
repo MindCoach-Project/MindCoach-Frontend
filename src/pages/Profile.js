@@ -68,11 +68,11 @@ const ProfilePage = () => {
               // src={profileData.profileImage}
               src="https://cdn-icons-png.flaticon.com/512/8792/8792047.png"
               alt="Profile"
-              className="w-32 h-32 rounded-full object-cover"
+              className="w-28 h-28 rounded-full object-cover"
             />
             <button 
               onClick={handleImageChange}
-              className="absolute bottom-0 right-0 bg-aqua text-white p-2 rounded-full"
+              className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
             >
               <Camera size={16} />
             </button>
@@ -83,17 +83,17 @@ const ProfilePage = () => {
             <div className="space-y-2">
               <h2 className="text-xl font-medium">{profileData.name}</h2>
               <p className="text-gray-600">
-                <strong>Date of Birth:</strong> {new Date(profileData.dateOfBirth).toLocaleDateString()}
+                {new Date(profileData.dateOfBirth).toLocaleDateString()}
               </p>
               <p className="text-gray-600">
-                <strong>Email:</strong> {profileData.email}
+                {profileData.email}
               </p>
               <Button
                 onClick={handleEditClick}
                 className="mt-4 flex items-center gap-2"
               >
                 <Edit size={16} />
-                Edit Profile
+                Update
               </Button>
             </div>
           </div>

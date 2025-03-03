@@ -1,79 +1,77 @@
-// EditProfileModal.js
-import React from 'react';
-import { X } from 'lucide-react';
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+  Input,
+  Button,
+  Label,
+} from "../ui";
+import { X } from "lucide-react";
 
 const EditProfileModal = ({ isOpen, onClose, formData, onChange, onSubmit }) => {
-  if (!isOpen) return null;
-  
   const handleFormSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
   };
-  
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Edit Profile</h2>
-          <button 
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={24} />
-          </button>
-        </div>
-        
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px] bg-inherit">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <div className="absolute right-2 top-2 flex space-x-3">
+            <DialogClose className="rounded-sm opacity-70 hover:opacity-100">
+              <X className="h-5 w-5" />
+            </DialogClose>
+          </div>
+        </DialogHeader>
+
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input
+            <Label>Name</Label>
+            <Input
               type="text"
               name="name"
               value={formData.name}
               onChange={onChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              placeholder="Enter your name"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-            <input
+            <Label>Date of Birth</Label>
+            <Input
               type="date"
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={onChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
+            <Label>Email</Label>
+            <Input
               type="email"
               name="email"
               value={formData.email}
               onChange={onChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              placeholder="Enter your email"
               required
             />
           </div>
           <div className="flex gap-2 pt-2">
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            >
-              Save Changes
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
-            >
+            <Button type="button" onClick={onClose} className="bg-gray-300 w-1/2 text-gray-800 hover:bg-gray-400">
               Cancel
-            </button>
+            </Button>
+            <Button type="submit" className="w-1/2">
+              Save Changes
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
