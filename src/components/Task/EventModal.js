@@ -28,6 +28,7 @@ import {
 } from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
 import { format } from "date-fns";
+import { TaskCompletionNotification } from "./TaskCompletionNotification";
 
 export function EventModal({
   isOpen,
@@ -37,7 +38,6 @@ export function EventModal({
   selectedTime,
   isLoading,
 }) {
-
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -50,6 +50,7 @@ export function EventModal({
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [error, setError] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     if (defaultValues) {
@@ -205,8 +206,12 @@ export function EventModal({
         await createTask(eventData);
       }
 
+      if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
+        console.log("Task marked as done. Showing notification...");
+        setShowNotification(true);
+      }
+
       onSubmit();
-      onClose();
     } catch (error) {
       setError(error.message || "Error saving task");
     }
@@ -418,6 +423,11 @@ export function EventModal({
         onClose={() => setIsSubtaskModalOpen(false)}
         onSubmit={handleSubtaskSubmit}
         defaultValues={selectedSubtask}
+      />
+
+      <TaskCompletionNotification
+        isOpen={showNotification}
+        onClose={() => setShowNotification(false)}
       />
     </>
   );
