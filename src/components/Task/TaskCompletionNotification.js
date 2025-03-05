@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogClose,
 } from "../ui";
-import { Button } from "../ui";
 
 const ENCOURAGEMENT_MESSAGES = [
   "Great job! You're making excellent progress!",
@@ -26,47 +25,44 @@ const ENCOURAGEMENT_MESSAGES = [
 
 export function TaskCompletionNotification({ isOpen, onClose }) {
   const [message, setMessage] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(100);
+  const [timeRemaining, setTimeRemaining] = useState(30);
   const audioRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
-      // Select a random encouragement message
+      console.log("🎉 Task Completed Notification Opened!");
+      
       const randomIndex = Math.floor(Math.random() * ENCOURAGEMENT_MESSAGES.length);
       setMessage(ENCOURAGEMENT_MESSAGES[randomIndex]);
 
-      // Play audio
       if (audioRef.current) {
-        audioRef.current.play().catch(error => console.error("Audio playback failed:", error));
+        console.log("🔊 Playing audio...");
+        audioRef.current.play().catch(error => console.error("❌ Audio playback failed:", error));
       }
-
-      // Trigger confetti
+      
       triggerConfetti();
 
-      // Start countdown
-      const timer = setInterval(() => {
-        setTimeRemaining(prev => {
+      timerRef.current = setInterval(() => {
+        setTimeRemaining((prev) => {
           if (prev <= 1) {
-            clearInterval(timer);
+            console.log("Task Completed Notification Closed!"); // nó ko hiện được console.log này. 
+            clearInterval(timerRef.current);
+            onClose(); 
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
-
-      // Cleanup function
-      return () => {
-        clearInterval(timer);
-      };
     }
+
+    return () => {
+      clearInterval(timerRef.current);
+    };
   }, [isOpen]);
 
   const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   };
 
   return (
@@ -90,37 +86,7 @@ export function TaskCompletionNotification({ isOpen, onClose }) {
           </DialogHeader>
 
           <div className="py-4">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <p className="text-center text-lg font-medium text-gray-800">
-              {message}
-            </p>
-          </div>
-
-          <div className="flex justify-center mt-2">
-            <Button
-              onClick={onClose}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              Continue
-            </Button>
+            <p className="text-center text-lg font-medium text-gray-800">{message}</p>
           </div>
         </DialogContent>
       </Dialog>
