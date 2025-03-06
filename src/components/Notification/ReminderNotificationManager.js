@@ -2,25 +2,64 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
+import { PushNotifications } from "@capacitor/push-notifications";
+import { isPlatform } from "@ionic/react";
 import { TaskCompletionNotification } from "../Task/TaskCompletionNotification";
 export function ReminderNotificationManager() {
-  // State to manage notification visibility and content
   const [notifications, setNotifications] = useState([]);
   const connectionRef = useRef(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Callback to close a specific notification
-  const handleCloseNotification = useCallback((id) => {
-    setNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id)
-    );
+  // Đăng ký Push Notification trên Mobile
+  useEffect(() => {
+    if (isPlatform("capacitor")) {
+      registerPushNotifications();
+    }
   }, []);
 
+  const registerPushNotifications = async () => {
+    try {
+      let permStatus = await PushNotifications.requestPermissions();
+      if (permStatus.receive === "granted") {
+        await PushNotifications.register();
+
+        PushNotifications.addListener("registration", (token) => {
+          console.log("Push registration success, token: ", token.value);
+        });
+
+        PushNotifications.addListener("registrationError", (error) => {
+          console.error("Push registration error: ", error);
+        });
+
+        PushNotifications.addListener(
+          "pushNotificationReceived",
+          (notification) => {
+            console.log("Push received: ", notification);
+            setNotifications((prev) => [
+              ...prev,
+              { id: notification.id, body: notification.body },
+            ]);
+          }
+        );
+
+        PushNotifications.addListener(
+          "pushNotificationActionPerformed",
+          (notification) => {
+            console.log("Notification action performed", notification);
+          }
+        );
+      } else {
+        console.warn("Push notification permission denied");
+      }
+    } catch (error) {
+      console.error("Error registering push notifications", error);
+    }
+  };
+
+  // Hàm thiết lập kết nối SignalR tren web
   // Robust connection establishment function
   const establishConnection = useCallback(async () => {
-    // Prevent multiple connection attempts
     if (isConnecting || connectionRef.current) return;
-
     setIsConnecting(true);
 
     try {
@@ -30,17 +69,12 @@ export function ReminderNotificationManager() {
           accessTokenFactory: () => {
             return localStorage.getItem("token") || "";
           },
-          // headers: {
-          //   "X-Reminder-Offset": localStorage.getItem("reminderOffset") || "30",
-          // },
-          // Add skipNegotiation and transport to improve connection reliability
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets,
         })
         .configureLogging(signalR.LogLevel.Information)
         .withAutomaticReconnect({
           nextRetryDelayInMilliseconds: (retryContext) => {
-            // Exponential backoff with jitter
             const baseDelay = 1000; // 1 second
             const maxDelay = 30000; // 30 seconds
             const jitter = Math.random() * 1000; // Random jitter up to 1 second
@@ -59,7 +93,6 @@ export function ReminderNotificationManager() {
         connectionRef.current = null;
         setIsConnecting(false);
 
-        // Attempt to reconnect
         await attemptReconnection();
       });
 
@@ -95,10 +128,7 @@ export function ReminderNotificationManager() {
 
   // Reconnection attempt function
   const attemptReconnection = useCallback(async () => {
-    // Wait a bit before attempting to reconnect
     await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Attempt to establish connection again
     await establishConnection();
   }, [establishConnection]);
 
@@ -117,6 +147,9 @@ export function ReminderNotificationManager() {
     // };
   }, [establishConnection]);
 
+
+
+
   // Periodic health check
   useEffect(() => {
     const healthCheckInterval = setInterval(async () => {
@@ -127,11 +160,18 @@ export function ReminderNotificationManager() {
         console.log("Performing health check and reconnecting...");
         await attemptReconnection();
       }
-    }, 30000); // Check every 30 seconds
+    }, 30000);
 
     return () => clearInterval(healthCheckInterval);
   }, [attemptReconnection]);
 
+  const handleCloseNotification = useCallback((id) => {
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
+    );
+  }, []);
+
+  console.log("notifications", notifications);
   return (
     <div>
       {notifications.map((notification) => (
@@ -142,13 +182,6 @@ export function ReminderNotificationManager() {
           taskDetails={notification}
         />
       ))}
-
-      {/* Optional: Connection status indicator */}
-      {isConnecting && (
-        <div className="fixed bottom-4 right-4 bg-yellow-100 text-yellow-800 p-2 rounded">
-          Connecting to notifications...
-        </div>
-      )}
     </div>
   );
 }

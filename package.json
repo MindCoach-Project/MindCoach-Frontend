@@ -12,6 +12,7 @@
     "@capacitor/local-notifications": "^7.0.0",
     "@capacitor/push-notifications": "^7.0.0",
     "@capacitor/status-bar": "7.0.0",
+    "@ionic/react": "^8.4.3",
     "@microsoft/signalr": "^8.0.7",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
