@@ -26,52 +26,57 @@ const ENCOURAGEMENT_MESSAGES = [
 export function TaskCompletionNotification({ isOpen, onClose }) {
   const [message, setMessage] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(30);
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
   const audioRef = useRef(null);
   const timerRef = useRef(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      console.log("🎉 Task Completed Notification Opened!");
-      
-      const randomIndex = Math.floor(Math.random() * ENCOURAGEMENT_MESSAGES.length);
-      setMessage(ENCOURAGEMENT_MESSAGES[randomIndex]);
+  // Effect for managing side effects when isOpen changes
+useEffect(() => {
+  if (!isOpen) return;
 
-      if (audioRef.current) {
-        console.log("🔊 Playing audio...");
-        audioRef.current.play().catch(error => console.error("❌ Audio playback failed:", error));
-      }
-      
-      triggerConfetti();
+  console.log(":tada: Task Completed Notification Opened!");
+  const randomIndex = Math.floor(Math.random() * ENCOURAGEMENT_MESSAGES.length);
+  setMessage(ENCOURAGEMENT_MESSAGES[randomIndex]);
+  if (audioRef.current) {
+      console.log(":loud_sound: Playing audio...");
+      audioRef.current.play().catch(error => console.error(":x: Audio playback failed:", error));
+  }
+  triggerConfetti();
+}, [isOpen]);
 
-      timerRef.current = setInterval(() => {
-        setTimeRemaining((prev) => {
+// Separate effect for managing the timer
+useEffect(() => {
+  if (!isOpen) return () => clearInterval(timerRef.current);
+
+  timerRef.current = setInterval(() => {
+      setTimeRemaining((prev) => {
           if (prev <= 1) {
-            console.log("Task Completed Notification Closed!"); // nó ko hiện được console.log này. 
-            clearInterval(timerRef.current);
-            onClose(); 
-            return 0;
+              console.log("Task Completed Notification Closed!");
+              clearInterval(timerRef.current);
+              onClose();
+              return 0;
           }
           return prev - 1;
-        });
-      }, 1000);
-    }
+      });
+  }, 1000);
 
-    return () => {
-      clearInterval(timerRef.current);
-    };
-  }, [isOpen]);
+  return () => clearInterval(timerRef.current);
+}, [isOpen]);
 
   const triggerConfetti = () => {
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   };
 
+  
+
   return (
     <>
       <audio ref={audioRef} preload="auto">
         <source src="/assets/sounds/audio.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
       </audio>
 
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isPopupOpen}>
         <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-green-50 to-blue-50 border-green-200">
           <DialogHeader>
             <DialogTitle className="text-center text-green-700 relative">
