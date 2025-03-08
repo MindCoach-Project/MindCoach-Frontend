@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { site_path } from "../utils";
 
 const ProfilePage = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "John Doe",
@@ -24,11 +24,11 @@ const ProfilePage = () => {
   const taskData = [
     { day: "M", "To Do": 3, "In Progress": 4, Done: 5 },
     { day: "T", "To Do": 2, "In Progress": 5, Done: 6 },
-    { day: "W", "To Do": 4, "In Progress": 3, Done: 7 },
-    { day: "T", "To Do": 3, "In Progress": 6, Done: 5 },
-    { day: "F", "To Do": 5, "In Progress": 4, Done: 4 },
-    { day: "S", "To Do": 2, "In Progress": 3, Done: 8 },
-    { day: "S", "To Do": 4, "In Progress": 5, Done: 6 },
+    { day: "TH", "To Do": 4, "In Progress": 3, Done: 7 },
+    // { day: "T", "To Do": 3, "In Progress": 6, Done: 5 },
+    // { day: "F", "To Do": 5, "In Progress": 4, Done: 4 },
+    // { day: "S", "To Do": 2, "In Progress": 3, Done: 8 },
+    // { day: "S", "To Do": 4, "In Progress": 5, Done: 6 },
   ];
 
   const handleEditClick = () => {

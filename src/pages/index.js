@@ -9,3 +9,4 @@ export { default as WorkTemplate } from "./WorkTemplate";
 export { default as HouseholdTemplate } from "./HouseholdTemplate";
 export { default as SportTemplate } from "./SportTemplate";
 export { default as RelaxTemplate } from "./RelaxTemplate";
+export { default as Reminder } from "./Reminder";

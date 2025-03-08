@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { ScheduleEvent, EmotionPicker, TemplateSection, Relaxation } from "../components";
+import {
+  ScheduleEvent,
+  EmotionPicker,
+  TemplateSection,
+  Relaxation,
+} from "../components";
 import { IconPlus } from "../components/ui";
 import { getTaskUpcoming } from "../api/task/getTaskUpcoming";
 import { EventModal } from "../components/Task";
@@ -38,7 +43,7 @@ function Home() {
   }, []);
 
   const openModal = () => {
-    setSelectedTask(null); 
+    setSelectedTask(null);
     setIsModalOpen(true);
   };
 
@@ -50,7 +55,7 @@ function Home() {
   const handleTaskUpdate = async () => {
     setIsLoading(true);
     try {
-      await fetchTasks(); 
+      await fetchTasks();
     } catch (error) {
       console.error("Error updating tasks:", error);
     } finally {
@@ -85,12 +90,11 @@ function Home() {
       <EmotionPicker />
       <TemplateSection />
       <Relaxation />
-      
-      
+
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
-          onEmotionClick={() => console.log("Emotion Clicked")}
+          onVoiceClick={() => console.log("Emotion Clicked")}
         />
       </div>
 
