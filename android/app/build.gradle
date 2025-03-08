@@ -46,9 +46,8 @@ dependencies {
 
     // Firebase Messaging (FCM)
     implementation 'com.google.firebase:firebase-messaging'
-
-    // Các dịch vụ Firebase khác (nếu cần, bạn có thể thêm ở đây)
     implementation 'com.google.firebase:firebase-analytics'
+    implementation project(':capacitor-firebase-messaging')
 }
 
 apply from: 'capacitor.build.gradle'

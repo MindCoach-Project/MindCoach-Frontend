@@ -77,7 +77,7 @@ const TaskStatusPage = () => {
     setIsModalOpen(false);
     setSelectedTask(null);
   };
-  
+
   const taskColors = [
     "bg-blue-100 border border-blue-300 border-l-4 border-l-blue-500",
     "bg-green-100 border border-green-300 border-l-4 border-l-green-500",
@@ -145,14 +145,18 @@ const TaskStatusPage = () => {
               )}
             </div>
             <p>
-              {dayjs(task.startTime).format("HH:mm")} - {dayjs(task.endTime).format("HH:mm")}
+              {dayjs(task.startTime).format("HH:mm")} -{" "}
+              {dayjs(task.endTime).format("HH:mm")}
             </p>
           </div>
         ))}
       </div>
-      
+
       <div className="absolute bottom-20 right-6">
-        <IconPlus onCalendarClick={openModal} onEmotionClick={() => console.log("Emotion Clicked")} />
+        <IconPlus
+          onCalendarClick={openModal}
+          onVoiceClick={() => console.log("Emotion Clicked")}
+        />
       </div>
 
       <EventModal
