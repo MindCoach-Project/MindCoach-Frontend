@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { X, Clock, CheckCircle2, ArrowDown } from "lucide-react";
+import { X, Clock, ArrowDown } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,34 +9,34 @@ import {
   DialogClose,
 } from "../ui";
 import { Button } from "../ui";
-
-// Utility function to format date strings
+import { formatVietnamDate } from "../../utils/TimezoneUtils";
 const formatTime = (dateString) => {
   if (!dateString) return "";
   
   try {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const date = formatVietnamDate(dateString); 
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } catch (error) {
     console.error("Invalid date format:", error);
     return dateString;
   }
 };
 
+
 // Utility function to check if times match
 const timesMatch = (time1, time2) => {
   if (!time1 || !time2) return false;
   
   try {
-    const date1 = new Date(time1);
-    const date2 = new Date(time2);
-    return date1.getHours() === date2.getHours() && 
-           date1.getMinutes() === date2.getMinutes();
+    const date1 = formatVietnamDate(time1);
+    const date2 = formatVietnamDate(time2);
+    return date1.getHours() === date2.getHours() && date1.getMinutes() === date2.getMinutes();
   } catch (error) {
     console.error("Error comparing times:", error);
     return false;
   }
 };
+
 
 export function ReminderForm({ 
   isOpen, 
@@ -61,7 +61,7 @@ export function ReminderForm({
     if (!hasSubtasks) return [];
     
     return [...taskDetails.subtaskMessages].sort((a, b) => 
-      new Date(a.startTime) - new Date(b.startTime)
+      formatVietnamDate(a.startTime) - formatVietnamDate(b.startTime)
     );
   };
   
