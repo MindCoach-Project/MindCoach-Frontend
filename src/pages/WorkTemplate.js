@@ -9,7 +9,7 @@ const WorkTemplate = () => {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const templatesData = await getTemplates();
+        const templatesData = await getTemplates("work");
 
         const formattedTemplates = templatesData.map((item) => ({
           id: item.id,

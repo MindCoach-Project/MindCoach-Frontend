@@ -27,8 +27,12 @@ import {
   deleteTask,
 } from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
-import { format } from "date-fns";
 import { TaskCompletionNotification } from "./TaskCompletionNotification";
+import { 
+  toVietnamTime, 
+  toISOStringUTC 
+} from "../../utils/TimezoneUtils";
+import { format } from "date-fns";
 
 export function EventModal({
   isOpen,
@@ -74,7 +78,7 @@ export function EventModal({
         setSubtasks([]);
       }
 
-      // Parse the ISO dates
+      // Parse the dates - they are already converted to Vietnam time in ListTasks.js
       const startDateTime = defaultValues.start
         ? new Date(defaultValues.start)
         : new Date();
@@ -97,7 +101,8 @@ export function EventModal({
         }
       }
     } else {
-      const now = selectedTime || new Date();
+      // For new tasks, use local Vietnam time
+      const now = selectedTime ? toVietnamTime(selectedTime) : toVietnamTime(new Date());
       const later = new Date(now.getTime() + 60 * 60 * 1000);
 
       setTitle("");
@@ -111,6 +116,8 @@ export function EventModal({
       setEndTime(format(later, "HH:mm"));
     }
   }, [defaultValues, selectedTime]);
+
+  
   const handleAddSubtask = () => {
     setSelectedSubtask(null);
     setIsSubtaskModalOpen(true);
@@ -173,36 +180,59 @@ export function EventModal({
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Create Date objects in local Vietnam time
     const startDateTime = new Date(`${startDate}T${startTime}:00`);
     const endDateTime = new Date(`${endDate}T${endTime}:00`);
 
     const processedSubtasks = subtasks.map((st) => {
       const isNewSubtask = !st.id.includes("-");
+      
+      // For both new and existing subtasks, convert Vietnam time to UTC ISO string
+      let startTimeUTC, endTimeUTC;
+      
+      if (isNewSubtask || typeof st.startTime === 'string') {
+        // If it's a new subtask or the time is already a string, create proper Date objects
+        const startDate = new Date(st.startTime);
+        const endDate = new Date(st.endTime);
+        
+        // Convert to UTC ISO strings
+        startTimeUTC = toISOStringUTC(startDate);
+        endTimeUTC = toISOStringUTC(endDate);
+      } else {
+        // The startTime and endTime are already Date objects
+        startTimeUTC = toISOStringUTC(st.startTime);
+        endTimeUTC = toISOStringUTC(st.endTime);
+      }
 
       return {
         ...(isNewSubtask ? {} : { id: st.id }),
         title: st.title,
-        startTime: st.startTime,
-        endTime: st.endTime,
+        startTime: startTimeUTC,
+        endTime: endTimeUTC,
         description: st.description || "",
         status: st.status || "todo",
       };
     });
+    console.log("eventdata be4", processedSubtasks);
 
     const eventData = {
       title,
       description,
       priority,
       status,
-      startTime: format(startDateTime, "yyyy-MM-dd'T'HH:mm:ss"),
-      endTime: format(endDateTime, "yyyy-MM-dd'T'HH:mm:ss"),
+      startTime: toISOStringUTC(startDateTime),
+      endTime: toISOStringUTC(endDateTime),
       subTasks: processedSubtasks,
     };
+
+    console.log("eventdata after5", eventData);
+
 
     try {
       if (defaultValues?.id) {
         await updateTask(defaultValues.id, eventData);
       } else {
+        console.log("task event data", eventData);
         await createTask(eventData);
       }
 
@@ -265,7 +295,7 @@ export function EventModal({
                 </div>
 
                 <div>
-                  <Label>Time Range</Label>
+                  <Label>Time Range (Vietnam Time)</Label>
                   <div className="grid gap-1">
                     <div>
                       <Label>Start</Label>

@@ -1,17 +1,35 @@
+import React, { useEffect, useState } from "react";
 import { TemplateLayout } from "../layouts";
 import { TaskList } from "../components/Template";
+import { getTemplates } from "../api/template";
 
 const RelaxTemplate = () => {
-  const relaxTasks = [
-    { time: "08:00", title: "Meditation" },
-    { time: "12:30", title: "Lunch with Friends" },
-    { time: "15:00", title: "Reading Book" },
-    { time: "21:00", title: "Watching Movie" },
-  ];
+  const [templates, setTemplates] = useState([]);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const templatesData = await getTemplates("relax");
+
+        const formattedTemplates = templatesData.map((item) => ({
+          id: item.id,
+          title: item.name,
+          tasks: item.unifiedTasks || [],
+        }));
+        setTemplates(formattedTemplates);
+      } catch (error) {
+        console.error("Error fetching templates:", error);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
 
   return (
-    <TemplateLayout title="Relax Time">
-      <TaskList tasks={relaxTasks} />
+    <TemplateLayout title="Relax Tasks">
+      {templates.map((template, index) => (
+        <TaskList key={index} tasks={[template]} />
+      ))}
     </TemplateLayout>
   );
 };
