@@ -11,7 +11,13 @@ import {
 } from "../ui";
 import { X } from "lucide-react";
 
-const EditProfileModal = ({ isOpen, onClose, formData, onChange, onSubmit }) => {
+const EditProfileModal = ({
+  isOpen,
+  onClose,
+  formData,
+  onChange,
+  onSubmit,
+}) => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
@@ -31,12 +37,14 @@ const EditProfileModal = ({ isOpen, onClose, formData, onChange, onSubmit }) => 
 
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <div>
-            <Label>Name</Label>
+            <Label>Username</Label>
             <Input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={onChange}
+              name="username"
+              value={formData.username}
+              onChange={(e) =>
+                onChange({ ...formData, username: e.target.value })
+              }
               placeholder="Enter your name"
               required
             />
@@ -46,23 +54,27 @@ const EditProfileModal = ({ isOpen, onClose, formData, onChange, onSubmit }) => 
             <Input
               type="date"
               name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={onChange}
+              value={formData.dateOfBirth || ""}
+              onChange={(e) =>
+                onChange({ ...formData, dateOfBirth: e.target.value })
+              }
+              max={
+                new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+                  .toISOString()
+                  .split("T")[0]
+              }
             />
           </div>
           <div>
             <Label>Email</Label>
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={onChange}
-              placeholder="Enter your email"
-              required
-            />
+            <Input type="email" name="email" value={formData.email} disabled />
           </div>
           <div className="flex gap-2 pt-2">
-            <Button type="button" onClick={onClose} className="bg-gray-300 w-1/2 text-gray-800 hover:bg-gray-400">
+            <Button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-300 w-1/2 text-gray-800 hover:bg-gray-400"
+            >
               Cancel
             </Button>
             <Button type="submit" className="w-1/2">

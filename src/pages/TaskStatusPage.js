@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { getTasksByDay, getTaskDetail } from "../api/task";
 import { EventModal } from "../components/Task";
 import { IconPlus } from "../components/ui";
+import { formatVietnamDate } from "../utils/TimezoneUtils";
 
 const TaskStatusPage = () => {
   const [date, setDate] = useState(dayjs());
@@ -18,8 +19,13 @@ const TaskStatusPage = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await getTasksByDay(date, status);
-      setTasks(response);
+      const data = await getTasksByDay(date, status);
+      const transformedData = data.map((task) => ({
+        ...task,
+        startTime: formatVietnamDate(task.startTime),
+        endTime: formatVietnamDate(task.endTime),
+      }));
+      setTasks(transformedData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
