@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { CalendarHeader, TimeGrid, EventModal } from "../components/Task";
 import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
-import { IconPlus } from "../components/ui"; 
+import { IconPlus } from "../components/ui";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(new Date());
@@ -22,7 +22,8 @@ export default function CalendarPage() {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
+      const tasks =
+        view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
 
       const transformedEvents = tasks.map((task) => ({
         id: task.id,
@@ -33,14 +34,15 @@ export default function CalendarPage() {
         start: new Date(task.startTime),
         end: new Date(task.endTime),
         type: task.type,
-        subtasks: task.subTasks?.map((st) => ({
-          id: st.id,
-          title: st.title,
-          description: st.description,
-          status: st.status.toLowerCase(),
-          startTime: st.startTime,
-          endTime: st.endTime,
-        })) || [],
+        subtasks:
+          task.subTasks?.map((st) => ({
+            id: st.id,
+            title: st.title,
+            description: st.description,
+            status: st.status.toLowerCase(),
+            startTime: st.startTime,
+            endTime: st.endTime,
+          })) || [],
       }));
 
       setEvents(transformedEvents);
@@ -66,14 +68,15 @@ export default function CalendarPage() {
           status: taskDetails.status.toLowerCase(),
           start: taskDetails.startTime,
           end: taskDetails.endTime,
-          subtasks: taskDetails.subTasks?.map((st) => ({
-            id: st.id,
-            title: st.title,
-            startTime: st.startTime,
-            endTime: st.endTime,
-            description: st.description,
-            status: st.status.toLowerCase(),
-          })) || [],
+          subtasks:
+            taskDetails.subTasks?.map((st) => ({
+              id: st.id,
+              title: st.title,
+              startTime: st.startTime,
+              endTime: st.endTime,
+              description: st.description,
+              status: st.status.toLowerCase(),
+            })) || [],
           selectedSubtaskId: event.id,
         };
 
@@ -89,14 +92,15 @@ export default function CalendarPage() {
           status: taskDetails.status.toLowerCase(),
           start: taskDetails.startTime,
           end: taskDetails.endTime,
-          subtasks: taskDetails.subTasks?.map((st) => ({
-            id: st.id,
-            title: st.title,
-            startTime: st.startTime,
-            endTime: st.endTime,
-            description: st.description,
-            status: st.status.toLowerCase(),
-          })) || [],
+          subtasks:
+            taskDetails.subTasks?.map((st) => ({
+              id: st.id,
+              title: st.title,
+              startTime: st.startTime,
+              endTime: st.endTime,
+              description: st.description,
+              status: st.status.toLowerCase(),
+            })) || [],
         };
 
         setSelectedEvent(transformedTask);
@@ -135,14 +139,28 @@ export default function CalendarPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <CalendarHeader date={date} view={view} onDateChange={setDate} onViewChange={setView} />
+      <CalendarHeader
+        date={date}
+        view={view}
+        onDateChange={setDate}
+        onViewChange={setView}
+      />
       <div ref={timeGridRef} className="flex-1 overflow-auto">
-        <TimeGrid date={date} view={view} events={events} onTimeClick={handleTimeClick} onEventClick={handleEventClick} />
+        <TimeGrid
+          date={date}
+          view={view}
+          events={events}
+          onTimeClick={handleTimeClick}
+          onEventClick={handleEventClick}
+        />
       </div>
 
       {/* Nút IconPlus để mở modal */}
       <div className="absolute bottom-20 right-6">
-        <IconPlus onCalendarClick={openModal} onEmotionClick={() => console.log("Emotion Clicked")} />
+        <IconPlus
+          onCalendarClick={openModal}
+          onVoiceClick={() => console.log("Emotion Clicked")}
+        />
       </div>
 
       {isModalOpen && (

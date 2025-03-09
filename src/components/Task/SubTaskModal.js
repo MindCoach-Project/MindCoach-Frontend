@@ -12,7 +12,7 @@ import { Input } from "../ui";
 import { Button } from "../ui";
 import { Label } from "../ui";
 import { X } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isAfter } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -29,13 +29,15 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
   const [endTime, setEndTime] = useState("");
   const [status, setStatus] = useState("todo");
 
-  // Reset form when modal opens/closes or defaultValues change
+  // Error states
+  const [titleError, setTitleError] = useState("");
+  const [timeError, setTimeError] = useState("");
+
   useEffect(() => {
     if (defaultValues) {
       setTitle(defaultValues.title || "");
       setStatus(defaultValues.status || "todo");
 
-      // Parse the ISO dates
       const startDateTime = defaultValues.startTime
         ? parseISO(defaultValues.startTime)
         : new Date();
@@ -49,7 +51,7 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
       setEndTime(format(endDateTime, "HH:mm"));
     } else {
       const now = new Date();
-      const later = new Date(now.getTime() + 30 * 60 * 1000); // 0.5 hour later
+      const later = new Date(now.getTime() + 30 * 60 * 1000); 
 
       setTitle("");
       setStatus("todo");
@@ -62,13 +64,20 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setTitleError("");
+    setTimeError("");
 
-    // Create ISO date strings without timezone offset
+    if (!title.trim()) {
+      setTitleError("Title is required.");
+      return;
+    }
+
+    // Create Date objects
     const startDateTime = new Date(`${startDate}T${startTime}:00`);
     const endDateTime = new Date(`${endDate}T${endTime}:00`);
 
-    if (endDateTime <= startDateTime) {
-      alert("End time must be after start time");
+    if (!isAfter(endDateTime, startDateTime)) {
+      setTimeError("End time must be after start time.");
       return;
     }
 
@@ -86,63 +95,42 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-inherit">
         <DialogHeader>
-          <DialogTitle>
-            {defaultValues ? "Update Subtask" : "Add Subtask"}
-          </DialogTitle>
+          <DialogTitle>{defaultValues ? "Update Subtask" : "Add Subtask"}</DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100">
             <X className="h-4 w-4" />
           </DialogClose>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-2">
+          {/* Title Input */}
           <div>
             <Label>Title</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter subtask title"
-              required
-            />
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter subtask title" />
+            {titleError && <p className="text-red-500 text-sm">{titleError}</p>}
           </div>
+
+          {/* Time Range Inputs */}
           <div>
             <Label>Time Range</Label>
             <div className="grid gap-4">
               <div>
                 <Label>Start</Label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    required
-                  />
+                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                  <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
                 </div>
               </div>
               <div>
                 <Label>End</Label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    min={startDate}
-                    required
-                  />
-                  <Input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    required
-                  />
+                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate} required />
+                  <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
                 </div>
               </div>
             </div>
+            {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
           </div>
+
+          {/* Status Select */}
           <div className="w-1/2">
             <Label>Status</Label>
             <Select value={status} onValueChange={setStatus}>
@@ -156,13 +144,13 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Buttons */}
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {defaultValues ? "Update Subtask" : "Add Subtask"}
-            </Button>
+            <Button type="submit">{defaultValues ? "Update Subtask" : "Add Subtask"}</Button>
           </div>
         </form>
       </DialogContent>
