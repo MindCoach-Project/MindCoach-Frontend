@@ -38,12 +38,8 @@ export function SubTaskModal({ isOpen, onClose, onSubmit, defaultValues }) {
       setTitle(defaultValues.title || "");
       setStatus(defaultValues.status || "todo");
 
-      const startDateTime = defaultValues.startTime
-        ? parseISO(defaultValues.startTime)
-        : new Date();
-      const endDateTime = defaultValues.endTime
-        ? parseISO(defaultValues.endTime)
-        : new Date();
+      const startDateTime = defaultValues.startTime;
+      const endDateTime = defaultValues.endTime;
 
       setStartDate(format(startDateTime, "yyyy-MM-dd"));
       setStartTime(format(startDateTime, "HH:mm"));
