@@ -8,12 +8,12 @@ import {
 import { IconPlus } from "../components/ui";
 import { getTaskUpcoming } from "../api/task/getTaskUpcoming";
 import { EventModal } from "../components/Task";
+import { formatVietnamDate } from "../utils/TimezoneUtils";
 function Home() {
   const [dateTime, setDateTime] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -28,11 +28,15 @@ function Home() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Fetch upcoming tasks
   const fetchTasks = async () => {
     try {
       const data = await getTaskUpcoming();
-      setTasks(data);
+      const transformedData = data.map((task) => ({
+        ...task,
+        startTime: formatVietnamDate(task.startTime),
+        endTime: formatVietnamDate(task.endTime),
+      }));
+      setTasks(transformedData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -103,7 +107,6 @@ function Home() {
         onClose={handleModalClose}
         onSubmit={handleTaskUpdate}
         defaultValues={selectedTask}
-        selectedTime={selectedTime}
         isLoading={isLoading}
       />
     </div>

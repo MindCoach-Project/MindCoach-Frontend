@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { X } from "lucide-react";
 import confetti from "canvas-confetti";
 import {
   Dialog,
@@ -9,7 +8,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "../ui";
-import { motion } from "framer-motion"; // Add animation
+import { motion } from "framer-motion"; 
 
 const ENCOURAGEMENT_MESSAGES = [
   "🎉 Great job! You're making excellent progress!",
