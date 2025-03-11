@@ -5,12 +5,14 @@ import { CalendarHeader, TimeGrid, EventModal } from "../components/Task";
 import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
 import { IconPlus } from "../components/ui";
 import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState("day");
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +82,6 @@ export default function CalendarPage() {
           })) || [],
         ...(event.type === "SubTask" ? { selectedSubtaskId: event.id } : {}),
       };
-      console.log(transformedTask);
       setSelectedEvent(transformedTask);
       setIsModalOpen(true);
     } catch (error) {
@@ -113,6 +114,14 @@ export default function CalendarPage() {
     setSelectedTime(null);
   };
 
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <CalendarHeader
@@ -135,7 +144,7 @@ export default function CalendarPage() {
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
-          onVoiceClick={() => console.log("Emotion Clicked")}
+          onVoiceClick={openVoiceRecordingModal}
         />
       </div>
 
@@ -153,6 +162,11 @@ export default function CalendarPage() {
           isLoading={isLoading}
         />
       )}
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
+      />
     </div>
   );
 }

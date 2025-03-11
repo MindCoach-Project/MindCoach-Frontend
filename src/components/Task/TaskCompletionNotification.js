@@ -30,21 +30,14 @@ export function TaskCompletionNotification({ isOpen, onClose }) {
 
   useEffect(() => {
     if (!isOpen) return;
-
-    console.log(":tada: Task Completed Notification Opened!");
-
-    // Pick a random encouragement message
     const randomIndex = Math.floor(Math.random() * ENCOURAGEMENT_MESSAGES.length);
     const selectedMessage = ENCOURAGEMENT_MESSAGES[randomIndex];
     setMessage(selectedMessage);
 
-    // Trigger confetti
     triggerConfetti();
 
-    // Speak the message
     speakMessage(selectedMessage);
 
-    // Start 30s countdown
     timerRef.current = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {

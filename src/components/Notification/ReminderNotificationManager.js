@@ -84,7 +84,6 @@ export function ReminderNotificationManager() {
 
       // Nhận thông báo từ SignalR
       connection.on("ReceiveReminder", async (notification) => {
-        console.log("📩 Nhận thông báo:", notification);
         setNotifications((prev) => [
           ...prev,
           { ...notification, id: notification.id || `reminder-${Date.now()}` },
@@ -96,11 +95,9 @@ export function ReminderNotificationManager() {
 
       // Kết nối với SignalR
       await connection.start();
-      console.log("✅ Kết nối SignalR thành công");
       connectionRef.current = connection;
       setIsConnecting(false);
     } catch (err) {
-      console.error("❌ Lỗi kết nối SignalR:", err);
       connectionRef.current = null;
       setIsConnecting(false);
       await attemptReconnection();
@@ -132,7 +129,6 @@ export function ReminderNotificationManager() {
         !connectionRef.current ||
         connectionRef.current.state !== signalR.HubConnectionState.Connected
       ) {
-        console.log("🔄 Kiểm tra kết nối, đang reconnect...");
         await attemptReconnection();
       }
     }, 30000);
@@ -177,7 +173,6 @@ export function ReminderNotificationManager() {
     );
   }, []);
 
-  console.log("📢 Danh sách thông báo:", notifications);
   return (
     <div>
       {notifications.map((notification) => (
