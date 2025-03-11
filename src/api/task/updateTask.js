@@ -2,8 +2,6 @@ import api from "../../utils/ApiUtils";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 export const updateTask = async (taskId, taskData) => {
-  console.log("task updated before update", taskData, taskId);
-
   try {
     const response = await api.put(
       `${apiUrl}/task-management/tasks/${taskId}`, taskData

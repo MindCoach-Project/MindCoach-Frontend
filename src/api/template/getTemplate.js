@@ -7,7 +7,6 @@ export const getTemplates = async (templateType) => {
     const response = await api.get(`${apiUrl}/template-management/templates`, {
       params: { templateType },
     });
-    console.log("Template response:", response);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching templates:", error);

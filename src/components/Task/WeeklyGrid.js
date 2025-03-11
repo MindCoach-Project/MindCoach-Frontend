@@ -6,7 +6,6 @@ import { Button } from "../ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function WeeklyGrid({ tasks, onTaskClick }) {
-  console.log("task in Weekiy grid", tasks);
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
   const getWeekDays = (date) => {

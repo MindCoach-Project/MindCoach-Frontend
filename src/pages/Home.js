@@ -9,10 +9,13 @@ import { IconPlus } from "../components/ui";
 import { getTaskUpcoming } from "../api/task/getTaskUpcoming";
 import { EventModal } from "../components/Task";
 import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task/VoiceRecordingModal"; 
+
 function Home() {
   const [dateTime, setDateTime] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,6 +57,14 @@ function Home() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedTask(null);
+  };
+
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
   };
 
   const handleTaskUpdate = async () => {
@@ -98,7 +109,7 @@ function Home() {
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
-          onVoiceClick={() => console.log("Emotion Clicked")}
+          onVoiceClick={openVoiceRecordingModal}
         />
       </div>
 
@@ -108,6 +119,11 @@ function Home() {
         onSubmit={handleTaskUpdate}
         defaultValues={selectedTask}
         isLoading={isLoading}
+      />
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
       />
     </div>
   );

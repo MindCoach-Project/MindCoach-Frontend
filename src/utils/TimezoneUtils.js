@@ -18,9 +18,21 @@ export const formatVietnamDate = (utcDate) => {
 
 export const toISOStringUTC = (localDate) => {
   if (!localDate) return null;
-  console.log("localdate", localDate);
   const utcDate = fromZonedTime(localDate, VIETNAM_TIMEZONE);
-  console.log("utcDate", utcDate); 
-  console.log("utcDate to ISO", utcDate.toISOString());
   return utcDate.toISOString();
+};
+
+
+export const formatDate = (isoString) => {
+  if (!isoString) return "Không xác định";
+  const date = new Date(isoString);
+  return date.toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };

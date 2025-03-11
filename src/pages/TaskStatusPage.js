@@ -4,12 +4,14 @@ import { getTasksByDay, getTaskDetail } from "../api/task";
 import { EventModal } from "../components/Task";
 import { IconPlus } from "../components/ui";
 import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task";
 
 const TaskStatusPage = () => {
   const [date, setDate] = useState(dayjs());
   const [status, setStatus] = useState("Todo");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,13 +49,13 @@ const TaskStatusPage = () => {
         description: taskDetail.description || "",
         priority: taskDetail.priority,
         status: taskDetail.status,
-        start: taskDetail.startTime,
-        end: taskDetail.endTime,
+        start: formatVietnamDate(taskDetail.startTime),
+        end: formatVietnamDate(taskDetail.endTime),
         subtasks: taskDetail.subTasks.map((subTask) => ({
           id: subTask.id,
           title: subTask.title,
-          startTime: subTask.startTime,
-          endTime: subTask.endTime,
+          startTime: formatVietnamDate(subTask.startTime),
+          endTime: formatVietnamDate(subTask.endTime),
           description: subTask.description || "",
           status: subTask.status,
         })),
@@ -76,6 +78,14 @@ const TaskStatusPage = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedTask(null);
+  };
+
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
   };
 
   const handleTaskUpdate = () => {
@@ -161,7 +171,7 @@ const TaskStatusPage = () => {
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
-          onVoiceClick={() => console.log("Emotion Clicked")}
+          onVoiceClick={openVoiceRecordingModal}
         />
       </div>
 
@@ -171,6 +181,11 @@ const TaskStatusPage = () => {
         onSubmit={handleTaskUpdate}
         defaultValues={selectedTask}
         isLoading={isLoading}
+      />
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
       />
     </>
   );

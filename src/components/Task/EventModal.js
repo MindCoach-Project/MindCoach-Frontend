@@ -213,7 +213,6 @@ export function EventModal({
         status: st.status || "todo",
       };
     });
-    console.log("eventdata be4", processedSubtasks);
 
     const eventData = {
       title,
@@ -225,19 +224,14 @@ export function EventModal({
       subTasks: processedSubtasks,
     };
 
-    console.log("eventdata after5", eventData);
-
-
     try {
       if (defaultValues?.id) {
         await updateTask(defaultValues.id, eventData);
       } else {
-        console.log("task event data", eventData);
         await createTask(eventData);
       }
 
       if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
-        console.log("Task marked as done. Showing notification...");
         setShowNotification(true);
       }
 
@@ -295,7 +289,7 @@ export function EventModal({
                 </div>
 
                 <div>
-                  <Label>Time Range (Vietnam Time)</Label>
+                  <Label>Time Range</Label>
                   <div className="grid gap-1">
                     <div>
                       <Label>Start</Label>

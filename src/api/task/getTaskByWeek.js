@@ -11,7 +11,6 @@ export const getTasksByWeek = async (date) => {
         },
       }
     );
-    console.log("event in weekly", response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching tasks by week:", error);
