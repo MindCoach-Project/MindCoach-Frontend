@@ -184,27 +184,6 @@ export function EventModal({
       return false;
     }
 
-    // Kiểm tra các subtask
-    for (const subtask of subtasks) {
-      if (!subtask.title.trim()) {
-        setError("Each subtask must have a title");
-        return false;
-      }
-
-      if (!subtask.startTime || !subtask.endTime) {
-        setError("Each subtask must have a valid start and end time");
-        return false;
-      }
-
-      const subStart = new Date(subtask.startTime);
-      const subEnd = new Date(subtask.endTime);
-
-      if (subEnd <= subStart) {
-        setError("Subtask end time must be after start time");
-        return false;
-      }
-    }
-
     setError("");
     return true;
   };
