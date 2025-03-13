@@ -28,11 +28,9 @@ import {
 } from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
 import { TaskCompletionNotification } from "./TaskCompletionNotification";
-import { 
-  toVietnamTime, 
-  toISOStringUTC 
-} from "../../utils/TimezoneUtils";
-import { format } from "date-fns";
+import { toVietnamTime, toISOStringUTC } from "../../utils/TimezoneUtils";
+import { format, isAfter } from "date-fns";
+import ToastMessage from "../ui/ToastMessage";
 
 export function EventModal({
   isOpen,
@@ -54,7 +52,10 @@ export function EventModal({
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [error, setError] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [timeError, setTimeError] = useState("");
   const [showNotification, setShowNotification] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (defaultValues) {
@@ -102,7 +103,9 @@ export function EventModal({
       }
     } else {
       // For new tasks, use local Vietnam time
-      const now = selectedTime ? toVietnamTime(selectedTime) : toVietnamTime(new Date());
+      const now = selectedTime
+        ? toVietnamTime(selectedTime)
+        : toVietnamTime(new Date());
       const later = new Date(now.getTime() + 60 * 60 * 1000);
 
       setTitle("");
@@ -117,7 +120,6 @@ export function EventModal({
     }
   }, [defaultValues, selectedTime]);
 
-  
   const handleAddSubtask = () => {
     setSelectedSubtask(null);
     setIsSubtaskModalOpen(true);
@@ -159,17 +161,48 @@ export function EventModal({
   };
 
   const validateForm = () => {
-    const start = new Date(`${startDate}T${startTime}:00`);
-    const end = new Date(`${endDate}T${endTime}:00`);
+    if (!title.trim()) {
+      setTitleError("Title is required.");
+      return;
+    }
 
-    if (end <= start) {
-      setError("End time must be after start time");
+    // Create Date objects
+    const startDateTime = new Date(`${startDate}T${startTime}:00`);
+    const endDateTime = new Date(`${endDate}T${endTime}:00`);
+
+    if (!isAfter(endDateTime, startDateTime)) {
+      setTimeError("End time must be after start time.");
+      return;
+    }
+
+    // Chuyển đổi thời gian sang UTC để kiểm tra chính xác
+    const start = new Date(`${startDate}T${startTime}:00Z`);
+    const end = new Date(`${endDate}T${endTime}:00Z`);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      setError("Invalid date or time format");
       return false;
     }
 
-    if (!title.trim()) {
-      setError("Title is required");
-      return false;
+    // Kiểm tra các subtask
+    for (const subtask of subtasks) {
+      if (!subtask.title.trim()) {
+        setError("Each subtask must have a title");
+        return false;
+      }
+
+      if (!subtask.startTime || !subtask.endTime) {
+        setError("Each subtask must have a valid start and end time");
+        return false;
+      }
+
+      const subStart = new Date(subtask.startTime);
+      const subEnd = new Date(subtask.endTime);
+
+      if (subEnd <= subStart) {
+        setError("Subtask end time must be after start time");
+        return false;
+      }
     }
 
     setError("");
@@ -186,15 +219,15 @@ export function EventModal({
 
     const processedSubtasks = subtasks.map((st) => {
       const isNewSubtask = !st.id.includes("-");
-      
+
       // For both new and existing subtasks, convert Vietnam time to UTC ISO string
       let startTimeUTC, endTimeUTC;
-      
-      if (isNewSubtask || typeof st.startTime === 'string') {
+
+      if (isNewSubtask || typeof st.startTime === "string") {
         // If it's a new subtask or the time is already a string, create proper Date objects
         const startDate = new Date(st.startTime);
         const endDate = new Date(st.endTime);
-        
+
         // Convert to UTC ISO strings
         startTimeUTC = toISOStringUTC(startDate);
         endTimeUTC = toISOStringUTC(endDate);
@@ -227,8 +260,10 @@ export function EventModal({
     try {
       if (defaultValues?.id) {
         await updateTask(defaultValues.id, eventData);
+        setToast({ type: "success", message: "Update task successful!" });
       } else {
         await createTask(eventData);
+        setToast({ type: "success", message: "Create task successful!" });
       }
 
       if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
@@ -271,12 +306,6 @@ export function EventModal({
             </div>
           ) : (
             <>
-              {error && (
-                <div className="bg-red-50 text-red-900 px-4 py-2 rounded-md mb-4">
-                  {error}
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-2">
                 <div>
                   <Label>Title</Label>
@@ -284,10 +313,11 @@ export function EventModal({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter task title"
-                    required
                   />
                 </div>
-
+                {titleError && (
+                  <p className="text-red-500 text-sm">{titleError}</p>
+                )}
                 <div>
                   <Label>Time Range</Label>
                   <div className="grid gap-1">
@@ -327,32 +357,77 @@ export function EventModal({
                       </div>
                     </div>
                   </div>
+                  {timeError && (
+                    <p className="text-red-500 text-sm">{timeError}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
+                  {/* Priority */}
                   <div>
-                    <Label>Priority</Label>
-                    <Select value={priority} onValueChange={setPriority}>
+                    <Label htmlFor="priority-select">Priority</Label>
+                    <Select
+                      id="priority-select"
+                      data-testid="priority-dropdown"
+                      value={priority}
+                      onValueChange={setPriority}
+                    >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue data-testid="priority-value" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem
+                          data-testid="priority-option-high"
+                          value="high"
+                        >
+                          High
+                        </SelectItem>
+                        <SelectItem
+                          data-testid="priority-option-medium"
+                          value="medium"
+                        >
+                          Medium
+                        </SelectItem>
+                        <SelectItem
+                          data-testid="priority-option-low"
+                          value="low"
+                        >
+                          Low
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                  {/* Status */}
                   <div>
-                    <Label>Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <Label htmlFor="status-select">Status</Label>
+                    <Select
+                      id="status-select"
+                      data-testid="status-dropdown"
+                      value={status}
+                      onValueChange={setStatus}
+                    >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue data-testid="status-value" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="inprogress">In Progress</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem
+                          data-testid="status-option-todo"
+                          value="todo"
+                        >
+                          To Do
+                        </SelectItem>
+                        <SelectItem
+                          data-testid="status-option-inprogress"
+                          value="inprogress"
+                        >
+                          In Progress
+                        </SelectItem>
+                        <SelectItem
+                          data-testid="status-option-done"
+                          value="done"
+                        >
+                          Done
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -453,6 +528,7 @@ export function EventModal({
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}
       />
+      {toast && <ToastMessage type={toast.type} message={toast.message} />}
     </>
   );
 }
