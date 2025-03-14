@@ -33,7 +33,7 @@ const Intro = () => {
         width={240}
       />
       <Button size="lg">
-        <Link to="/login">Get started</Link>
+        <Link to="/onboard/1">Get started</Link>
       </Button>
     </div>
   );
