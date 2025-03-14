@@ -9,7 +9,7 @@ import ToastMessage from "../components/ui/ToastMessage";
 import { loginUser } from "../api/auth/login";
 
 function Login() {
-  const [state, dispatch] = useGlobalState();
+  const {state, dispatch} = useGlobalState();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -18,14 +18,20 @@ function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" })); 
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate(site_path.HOME); 
+    if (localStorage.getItem("token")) {
+      navigate(site_path.HOME);
     }
-  }, []);
+  }, [navigate]);
+
+
+  const saveUserToLocalStorage = ({ token, username, email, imageUrl }) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify({ username, email, imageUrl }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,16 +45,10 @@ function Login() {
       const { data } = await loginUser(formData);
       setToast({ type: "success", message: "Login successful!" });
 
-      const { token, username, email, imageUrl } = data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ username, email, imageUrl })
-      );
+      saveUserToLocalStorage(data);
 
       dispatch(actions.setIsLogin(true));
-      dispatch(actions.setUser({ username, email, imageUrl }));
+      dispatch(actions.setUser(data));
 
       setTimeout(() => navigate(site_path.HOME), 1000);
     } catch (error) {

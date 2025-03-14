@@ -3,13 +3,16 @@
 import { useState, useRef, useEffect } from "react";
 import { CalendarHeader, TimeGrid, EventModal } from "../components/Task";
 import { getTasksByDay, getTasksByWeek, getTaskDetail } from "../api/task";
-import { IconPlus } from "../components/ui"; 
+import { IconPlus } from "../components/ui";
+import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState("day");
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +25,8 @@ export default function CalendarPage() {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const tasks = view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
+      const tasks =
+        view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
 
       const transformedEvents = tasks.map((task) => ({
         id: task.id,
@@ -30,17 +34,18 @@ export default function CalendarPage() {
         description: task.description,
         priority: task.priority.toLowerCase(),
         status: task.status.toLowerCase(),
-        start: new Date(task.startTime),
-        end: new Date(task.endTime),
+        start: formatVietnamDate(task.startTime),
+        end: formatVietnamDate(task.endTime),
         type: task.type,
-        subtasks: task.subTasks?.map((st) => ({
-          id: st.id,
-          title: st.title,
-          description: st.description,
-          status: st.status.toLowerCase(),
-          startTime: st.startTime,
-          endTime: st.endTime,
-        })) || [],
+        subtasks:
+          task.subTasks?.map((st) => ({
+            id: st.id,
+            title: st.title,
+            description: st.description,
+            status: st.status.toLowerCase(),
+            startTime: formatVietnamDate(st.startTime),
+            endTime: formatVietnamDate(st.endTime),
+          })) || [],
       }));
 
       setEvents(transformedEvents);
@@ -55,53 +60,29 @@ export default function CalendarPage() {
     try {
       setIsLoading(true);
 
-      if (event.type === "SubTask" && event.parentId) {
-        const taskDetails = await getTaskDetail(event.parentId);
-
-        const transformedTask = {
-          id: taskDetails.id,
-          title: taskDetails.title,
-          description: taskDetails.description,
-          priority: taskDetails.priority.toLowerCase(),
-          status: taskDetails.status.toLowerCase(),
-          start: taskDetails.startTime,
-          end: taskDetails.endTime,
-          subtasks: taskDetails.subTasks?.map((st) => ({
+      const taskDetails = await getTaskDetail(
+        event.type === "SubTask" && event.parentId ? event.parentId : event.id
+      );
+      const transformedTask = {
+        id: taskDetails.id,
+        title: taskDetails.title,
+        description: taskDetails.description,
+        priority: taskDetails.priority.toLowerCase(),
+        status: taskDetails.status.toLowerCase(),
+        start: formatVietnamDate(taskDetails.startTime),
+        end: formatVietnamDate(taskDetails.endTime),
+        subtasks:
+          taskDetails.subTasks?.map((st) => ({
             id: st.id,
             title: st.title,
-            startTime: st.startTime,
-            endTime: st.endTime,
+            startTime: formatVietnamDate(st.startTime),
+            endTime: formatVietnamDate(st.endTime),
             description: st.description,
             status: st.status.toLowerCase(),
           })) || [],
-          selectedSubtaskId: event.id,
-        };
-
-        setSelectedEvent(transformedTask);
-      } else {
-        const taskDetails = await getTaskDetail(event.id);
-
-        const transformedTask = {
-          id: taskDetails.id,
-          title: taskDetails.title,
-          description: taskDetails.description,
-          priority: taskDetails.priority.toLowerCase(),
-          status: taskDetails.status.toLowerCase(),
-          start: taskDetails.startTime,
-          end: taskDetails.endTime,
-          subtasks: taskDetails.subTasks?.map((st) => ({
-            id: st.id,
-            title: st.title,
-            startTime: st.startTime,
-            endTime: st.endTime,
-            description: st.description,
-            status: st.status.toLowerCase(),
-          })) || [],
-        };
-
-        setSelectedEvent(transformedTask);
-      }
-
+        ...(event.type === "SubTask" ? { selectedSubtaskId: event.id } : {}),
+      };
+      setSelectedEvent(transformedTask);
       setIsModalOpen(true);
     } catch (error) {
       console.error("Error loading task details:", error);
@@ -133,16 +114,38 @@ export default function CalendarPage() {
     setSelectedTime(null);
   };
 
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <CalendarHeader date={date} view={view} onDateChange={setDate} onViewChange={setView} />
+      <CalendarHeader
+        date={date}
+        view={view}
+        onDateChange={setDate}
+        onViewChange={setView}
+      />
       <div ref={timeGridRef} className="flex-1 overflow-auto">
-        <TimeGrid date={date} view={view} events={events} onTimeClick={handleTimeClick} onEventClick={handleEventClick} />
+        <TimeGrid
+          date={date}
+          view={view}
+          events={events}
+          onTimeClick={handleTimeClick}
+          onEventClick={handleEventClick}
+        />
       </div>
 
       {/* Nút IconPlus để mở modal */}
       <div className="absolute bottom-20 right-6">
-        <IconPlus onCalendarClick={openModal} onEmotionClick={() => console.log("Emotion Clicked")} />
+        <IconPlus
+          onCalendarClick={openModal}
+          onVoiceClick={openVoiceRecordingModal}
+        />
       </div>
 
       {isModalOpen && (
@@ -159,6 +162,11 @@ export default function CalendarPage() {
           isLoading={isLoading}
         />
       )}
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
+      />
     </div>
   );
 }

@@ -6,4 +6,5 @@ export { getTaskDetail } from "./getTaskDetail";
 export { getTasksByDay } from "./getTaskByDay";
 export { getTasksByWeek } from "./getTaskByWeek";
 export { getTaskUpcoming } from "./getTaskUpcoming";
-
+export { getTrackingWeek } from "./getTrackingWeek";
+export { callGeminiAPI } from "./geminiApi";

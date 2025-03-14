@@ -3,12 +3,15 @@ import dayjs from "dayjs";
 import { getTasksByDay, getTaskDetail } from "../api/task";
 import { EventModal } from "../components/Task";
 import { IconPlus } from "../components/ui";
+import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task";
 
 const TaskStatusPage = () => {
   const [date, setDate] = useState(dayjs());
   const [status, setStatus] = useState("Todo");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -18,8 +21,13 @@ const TaskStatusPage = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await getTasksByDay(date, status);
-      setTasks(response);
+      const data = await getTasksByDay(date, status);
+      const transformedData = data.map((task) => ({
+        ...task,
+        startTime: formatVietnamDate(task.startTime),
+        endTime: formatVietnamDate(task.endTime),
+      }));
+      setTasks(transformedData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -41,13 +49,13 @@ const TaskStatusPage = () => {
         description: taskDetail.description || "",
         priority: taskDetail.priority,
         status: taskDetail.status,
-        start: taskDetail.startTime,
-        end: taskDetail.endTime,
+        start: formatVietnamDate(taskDetail.startTime),
+        end: formatVietnamDate(taskDetail.endTime),
         subtasks: taskDetail.subTasks.map((subTask) => ({
           id: subTask.id,
           title: subTask.title,
-          startTime: subTask.startTime,
-          endTime: subTask.endTime,
+          startTime: formatVietnamDate(subTask.startTime),
+          endTime: formatVietnamDate(subTask.endTime),
           description: subTask.description || "",
           status: subTask.status,
         })),
@@ -72,12 +80,20 @@ const TaskStatusPage = () => {
     setSelectedTask(null);
   };
 
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
+  };
+
   const handleTaskUpdate = () => {
     fetchTasks();
     setIsModalOpen(false);
     setSelectedTask(null);
   };
-  
+
   const taskColors = [
     "bg-blue-100 border border-blue-300 border-l-4 border-l-blue-500",
     "bg-green-100 border border-green-300 border-l-4 border-l-green-500",
@@ -145,14 +161,18 @@ const TaskStatusPage = () => {
               )}
             </div>
             <p>
-              {dayjs(task.startTime).format("HH:mm")} - {dayjs(task.endTime).format("HH:mm")}
+              {dayjs(task.startTime).format("HH:mm")} -{" "}
+              {dayjs(task.endTime).format("HH:mm")}
             </p>
           </div>
         ))}
       </div>
-      
+
       <div className="absolute bottom-20 right-6">
-        <IconPlus onCalendarClick={openModal} onEmotionClick={() => console.log("Emotion Clicked")} />
+        <IconPlus
+          onCalendarClick={openModal}
+          onVoiceClick={openVoiceRecordingModal}
+        />
       </div>
 
       <EventModal
@@ -161,6 +181,11 @@ const TaskStatusPage = () => {
         onSubmit={handleTaskUpdate}
         defaultValues={selectedTask}
         isLoading={isLoading}
+      />
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Plus, Calendar, Smile } from "lucide-react";
+import { Plus, Calendar, Mic } from "lucide-react";
 
-export default function IconPlus({ onCalendarClick, onEmotionClick }) {
+export default function IconPlus({ onCalendarClick, onVoiceClick }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -16,16 +16,16 @@ export default function IconPlus({ onCalendarClick, onEmotionClick }) {
       {isOpen && (
         <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 flex flex-col gap-3">
           <button
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-yellow-500 text-white shadow-md hover:bg-yellow-700 transition"
+            onClick={onVoiceClick}
+          >
+            <Mic size={20} />
+          </button>
+          <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-green-500 text-white shadow-md hover:bg-green-700 transition"
             onClick={onCalendarClick}
           >
             <Calendar size={20} />
-          </button>
-          <button
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-yellow-500 text-white shadow-md hover:bg-yellow-700 transition"
-            onClick={onEmotionClick}
-          >
-            <Smile size={20} />
           </button>
         </div>
       )}

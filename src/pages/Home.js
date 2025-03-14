@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { ScheduleEvent, EmotionPicker, TemplateSection, Relaxation } from "../components";
+import {
+  ScheduleEvent,
+  EmotionPicker,
+  TemplateSection,
+  Relaxation,
+} from "../components";
 import { IconPlus } from "../components/ui";
 import { getTaskUpcoming } from "../api/task/getTaskUpcoming";
 import { EventModal } from "../components/Task";
+import { formatVietnamDate } from "../utils/TimezoneUtils";
+import { VoiceRecordingModal } from "../components/Task/VoiceRecordingModal"; 
+
 function Home() {
   const [dateTime, setDateTime] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -23,11 +31,15 @@ function Home() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Fetch upcoming tasks
   const fetchTasks = async () => {
     try {
       const data = await getTaskUpcoming();
-      setTasks(data);
+      const transformedData = data.map((task) => ({
+        ...task,
+        startTime: formatVietnamDate(task.startTime),
+        endTime: formatVietnamDate(task.endTime),
+      }));
+      setTasks(transformedData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -38,7 +50,7 @@ function Home() {
   }, []);
 
   const openModal = () => {
-    setSelectedTask(null); 
+    setSelectedTask(null);
     setIsModalOpen(true);
   };
 
@@ -47,10 +59,18 @@ function Home() {
     setSelectedTask(null);
   };
 
+  const openVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(true);
+  };
+
+  const closeVoiceRecordingModal = () => {
+    setIsVoiceModalOpen(false);
+  };
+
   const handleTaskUpdate = async () => {
     setIsLoading(true);
     try {
-      await fetchTasks(); 
+      await fetchTasks();
     } catch (error) {
       console.error("Error updating tasks:", error);
     } finally {
@@ -85,12 +105,11 @@ function Home() {
       <EmotionPicker />
       <TemplateSection />
       <Relaxation />
-      
-      
+
       <div className="absolute bottom-20 right-6">
         <IconPlus
           onCalendarClick={openModal}
-          onEmotionClick={() => console.log("Emotion Clicked")}
+          onVoiceClick={openVoiceRecordingModal}
         />
       </div>
 
@@ -99,8 +118,12 @@ function Home() {
         onClose={handleModalClose}
         onSubmit={handleTaskUpdate}
         defaultValues={selectedTask}
-        selectedTime={selectedTime}
         isLoading={isLoading}
+      />
+
+      <VoiceRecordingModal
+        isOpen={isVoiceModalOpen}
+        onClose={closeVoiceRecordingModal}
       />
     </div>
   );

@@ -1,14 +1,17 @@
 import api from "../../utils/ApiUtils";
+
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-export const updateTask = async (taskId, taskData) => {
+export const updateReminderOffset = async (reminderOffsetData) => {
   try {
     const response = await api.put(
-      `${apiUrl}/task-management/tasks/${taskId}`, taskData
+      `${apiUrl}/users/update-reminder-offset`, 
+      reminderOffsetData
     );
+    
     return response.data.data;
   } catch (error) {
-    console.error("Error updating task:", error);
+    console.error("Error updating reminder offset:", error);
     throw error.response?.data || error;
   }
 };

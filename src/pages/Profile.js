@@ -1,51 +1,37 @@
-// ProfilePage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, Camera, LogOut } from "lucide-react";
 import EditProfileModal from "../components/Profile/EditProfileModal";
 import TaskStatusChart from "../components/Profile/TaskStatusChart";
 import { Button } from "../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import { site_path } from "../utils";
+import { getTrackingWeek } from "../api/task";
 
 const ProfilePage = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "John Doe",
-    dateOfBirth: "1990-01-01",
-    email: "john.doe@example.com",
-    profileImage: "/api/placeholder/150/150",
-  });
 
-  // Temporary state for form data
+  // ✅ Lấy profile từ localStorage khi load trang
+  const getStoredProfile = () => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser
+      ? JSON.parse(storedUser)
+      : { username: "John Doe", email: "john.doe@example.com", dateOfBirth: "", imageUrl: "/images/users/default-user" };
+  };
+
+  const [profileData, setProfileData] = useState(getStoredProfile);
+  const [taskData, setTaskData] = useState([]);
   const [formData, setFormData] = useState({ ...profileData });
-
-  // Simulated chart data for the week
-  const taskData = [
-    { day: "M", "To Do": 3, "In Progress": 4, Done: 5 },
-    { day: "T", "To Do": 2, "In Progress": 5, Done: 6 },
-    { day: "W", "To Do": 4, "In Progress": 3, Done: 7 },
-    { day: "T", "To Do": 3, "In Progress": 6, Done: 5 },
-    { day: "F", "To Do": 5, "In Progress": 4, Done: 4 },
-    { day: "S", "To Do": 2, "In Progress": 3, Done: 8 },
-    { day: "S", "To Do": 4, "In Progress": 5, Done: 6 },
-  ];
 
   const handleEditClick = () => {
     setFormData({ ...profileData });
     setIsEditModalOpen(true);
   };
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
+  // ✅ Lưu dữ liệu vào localStorage khi user cập nhật profile
   const handleFormSubmit = (updatedData) => {
     setProfileData(updatedData);
+    localStorage.setItem("user", JSON.stringify(updatedData)); // 🔥 Lưu vào localStorage
     setIsEditModalOpen(false);
   };
 
@@ -55,10 +41,9 @@ const ProfilePage = () => {
 
   const handleImageChange = () => {
     const imageId = Math.floor(Math.random() * 1000);
-    setProfileData((prev) => ({
-      ...prev,
-      profileImage: `/api/placeholder/150/150?id=${imageId}`,
-    }));
+    const updatedProfile = { ...profileData, imageUrl: `/api/placeholder/150/150?id=${imageId}` };
+    setProfileData(updatedProfile);
+    localStorage.setItem("user", JSON.stringify(updatedProfile)); // 🔥 Cập nhật avatar vào localStorage
   };
 
   const handleLogoutClick = () => {
@@ -67,12 +52,29 @@ const ProfilePage = () => {
     setTimeout(() => navigate(site_path.INTRO), 1000);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiData = await getTrackingWeek();
+        const fullWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const formattedData = fullWeek.map((day) => {
+          const found = apiData.find((item) => item.date === day);
+          return { day, "To Do": found ? found.toDo : 0, "In Progress": found ? found.inProgress : 0, Done: found ? found.done : 0 };
+        });
+
+        setTaskData(formattedData);
+      } catch (error) {
+        console.error("Error fetching task tracking data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div>
-      {/* Section 1: Top Section */}
       <div className="flex flex-row justify-between">
-        {/* Profile Image */}
-        <div className="relative">
+      <div className="relative">
           <img
             // src={profileData.profileImage}
             src="https://cdn-icons-png.flaticon.com/512/8792/8792047.png"
@@ -87,26 +89,19 @@ const ProfilePage = () => {
           </button>
         </div>
 
-        {/* User Info */}
         <div className="flex flex-col">
           <div className="space-y-2">
-            <h2 className="text-xl font-medium">{profileData.name}</h2>
+            <h2 className="text-xl font-medium">{profileData.username}</h2>
             <p className="text-gray-600">
-              {new Date(profileData.dateOfBirth).toLocaleDateString()}
+              {profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toLocaleDateString() : "N/A"}
             </p>
             <p className="text-gray-600">{profileData.email}</p>
             <div className="flex gap-2">
-              <Button
-                onClick={handleEditClick}
-                className="mt-4 flex items-center gap-1"
-              >
+              <Button onClick={handleEditClick} className="mt-4 flex items-center gap-1">
                 <Edit size={16} />
                 Update
               </Button>
-              <Button
-                onClick={handleLogoutClick}
-                className="mt-4 flex items-center gap-1 bg-gray-300 text-gray-800 hover:bg-gray-400"
-              >
+              <Button onClick={handleLogoutClick} className="mt-4 flex items-center gap-1 bg-gray-300 text-gray-800 hover:bg-gray-400">
                 <LogOut size={16} />
                 Logout
               </Button>
@@ -115,17 +110,9 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Section 2: Bottom Section */}
       <TaskStatusChart data={taskData} />
 
-      {/* Edit Profile Modal */}
-      <EditProfileModal
-        isOpen={isEditModalOpen}
-        onClose={handleCloseModal}
-        formData={formData}
-        onChange={handleFormChange}
-        onSubmit={handleFormSubmit}
-      />
+      <EditProfileModal isOpen={isEditModalOpen} onClose={handleCloseModal} formData={formData} onChange={setFormData} onSubmit={handleFormSubmit} />
     </div>
   );
 };
