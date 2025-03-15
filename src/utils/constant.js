@@ -1,9 +1,9 @@
 export const USER_ROLE = {
-    ADMIN: 'admin',
-    Employee: 'employee'
-}
-
+  ADMIN: "admin",
+  Employee: "employee",
+};
 export const site_path = {
+
     INTRO: '/',
     HOME: '/home',
     TASKS: 'tasks',

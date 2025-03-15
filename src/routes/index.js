@@ -1,7 +1,19 @@
-import { Home, Intro, ListTasks, Profile, TaskStatusPage, WorkTemplate, HouseholdTemplate, SportTemplate, RelaxTemplate, Reminder } from "../pages";
+import {
+  Home,
+  Intro,
+  ListTasks,
+  Profile,
+  TaskStatusPage,
+  WorkTemplate,
+  HouseholdTemplate,
+  SportTemplate,
+  RelaxTemplate,
+} from "../pages";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
+import OnBoard1 from "../components/Onboarding/Step1";
+import OnBoard2 from "../components/Onboarding/Step2";
 
 const files = require.context(".", false, /\.js$/);
 
@@ -10,6 +22,21 @@ let publicRoutes = [
     path: site_path.INTRO,
     component: Intro,
     layout: LoginLayout,
+  },
+  {
+    path: site_path.ONBOARD1,
+    component: OnBoard1,
+    layout: LoginLayout,
+  },
+  {
+    path: site_path.ONBOARD2,
+    component: OnBoard2,
+    layout: LoginLayout,
+  },
+  {
+    path: site_path.ONBOARD3,
+    // component: Intro,
+    // layout: LoginLayout,
   },
 ];
 let privateRoutes = [
@@ -24,19 +51,19 @@ let privateRoutes = [
     component: ListTasks,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
-  }, 
+  },
   {
     path: site_path.TASKSTATUS,
-    component:TaskStatusPage,
+    component: TaskStatusPage,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
   },
   {
     path: site_path.PROFILE,
-    component:Profile ,
+    component: Profile,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
-  }, 
+  },
   {
     path: site_path.TEMPLATE_WORK,
     component: WorkTemplate,
@@ -61,12 +88,6 @@ let privateRoutes = [
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
   },
-  {
-    path: site_path.REMINDER,
-    component: Reminder,
-    layout: DefaultLayout,
-    error: AthUtils.handleAuthorization,
-  }
 ];
 
 files.keys().forEach((fileName) => {

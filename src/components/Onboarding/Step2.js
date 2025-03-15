@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OnBoard1 = () => {
+const OnBoard2 = () => {
   const navigate = useNavigate();
   const [selectedTime, setSelectedTime] = useState("09:00");
 
@@ -23,11 +23,11 @@ const OnBoard1 = () => {
       </div>
 
       <h2 className="text-white text-3xl font-semibold mt-2 text-center">
-        What time do you usually start the day?
+        What time do you go to bed?
       </h2>
 
       {/* Hình ảnh mặt trời */}
-      <img src="/assets/images/sun.png" alt="Sun" className="w-50 h-15 my-1" />
+      <img src="/assets/images/moon.png" alt="Sun" className="w-40 h-15 my-1" />
 
       {/* Time Picker */}
       {/* Time Picker */}
@@ -51,7 +51,7 @@ const OnBoard1 = () => {
       {/* Button Next */}
       <button
         className="mt-10 w-16 h-16 flex items-center justify-center bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 transition text-2xl"
-        onClick={() => navigate("/onboard/2")}
+        onClick={() => navigate("/onboard/3")}
       >
         ➜
       </button>
@@ -59,4 +59,4 @@ const OnBoard1 = () => {
   );
 };
 
-export default OnBoard1;
+export default OnBoard2;
