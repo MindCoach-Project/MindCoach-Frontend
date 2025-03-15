@@ -26,7 +26,7 @@ const OnBoard5 = () => {
       {/* Title */}
       <h1
         className="text-white text-3xl mt-[-10px] font-bold text-center leading-tight"
-        style={{ position: "relative", top: "-15x0px" }}
+        style={{ position: "relative", top: "-150px" }}
       >
         Register account <br /> to connect with <br />
         <span className="text-white">MindCoach!</span>
