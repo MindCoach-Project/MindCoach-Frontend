@@ -1,15 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const OnBoard1 = () => {
   const navigate = useNavigate();
-  const [selectedTime, setSelectedTime] = useState("09:00");
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
+  const minutes = Array.from({ length: 60 }, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
 
-  // Danh sách giờ mẫu (bạn có thể làm dynamic nếu cần)
-  const times = ["07:58", "08:59", "09:00", "10:01"];
+  const [selectedHour, setSelectedHour] = useState("09");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+
+  const hourRef = useRef(null);
+  const minuteRef = useRef(null);
+  const itemHeight = 50;
+
+  useEffect(() => {
+    scrollToSelected(hourRef, hours.indexOf(selectedHour));
+    scrollToSelected(minuteRef, minutes.indexOf(selectedMinute));
+  }, []);
+
+  const scrollToSelected = (ref, index) => {
+    if (ref.current) {
+      ref.current.scrollTop = index * itemHeight;
+    }
+  };
+
+  const handleScroll = (ref, setValue, list) => {
+    if (ref.current) {
+      const index = Math.round(ref.current.scrollTop / itemHeight);
+      setValue(list[index]);
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-orange-300 px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-custom-gradient px-4">
       {/* Progress Dots */}
       <div className="flex space-x-2 absolute top-14">
         {[...Array(5)].map((_, i) => (
@@ -26,35 +53,80 @@ const OnBoard1 = () => {
         What time do you usually start the day?
       </h2>
 
-      {/* Hình ảnh mặt trời */}
-      <img src="/assets/images/sun.png" alt="Sun" className="w-50 h-15 my-1" />
+      <img src="/assets/images/sun.png" alt="Sun" className="w-50 h-15 mt-4" />
 
       {/* Time Picker */}
-      {/* Time Picker */}
-      <div className="relative w-60 h-40 overflow-hidden mb-6">
-        <div className="flex flex-col items-center text-white text-2xl space-y-2">
-          {times.map((time, index) => (
-            <span
-              key={index}
-              className={`transition ${
-                time === selectedTime
-                  ? "text-white font-bold text-3xl"
-                  : "text-gray-200"
-              }`}
-            >
-              {time}
-            </span>
-          ))}
+      <div className="relative flex items-center space-x-2 mt-6">
+        <div className="relative w-20 h-40 overflow-hidden flex justify-center">
+          <div
+            ref={hourRef}
+            className="h-full overflow-y-scroll scrollbar-hide text-center"
+            onScroll={() => handleScroll(hourRef, setSelectedHour, hours)}
+          >
+            <div className="flex flex-col items-center py-16">
+              {hours.map((hour, index) => (
+                <div
+                  key={index}
+                  className={`transition-all text-2xl py-2 ${
+                    hour === selectedHour
+                      ? "text-white font-bold text-3xl"
+                      : "text-gray-300"
+                  }`}
+                  style={{ height: itemHeight }}
+                >
+                  {hour}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="text-white text-3xl font-bold flex items-center">
+          :
+        </span>
+
+        <div className="relative w-20 h-40 overflow-hidden flex justify-center">
+          <div
+            ref={minuteRef}
+            className="h-full overflow-y-scroll scrollbar-hide text-center"
+            onScroll={() => handleScroll(minuteRef, setSelectedMinute, minutes)}
+          >
+            <div className="flex flex-col items-center py-16">
+              {minutes.map((minute, index) => (
+                <div
+                  key={index}
+                  className={`transition-all text-2xl py-2 ${
+                    minute === selectedMinute
+                      ? "text-white font-bold text-3xl"
+                      : "text-gray-300"
+                  }`}
+                  style={{ height: itemHeight }}
+                >
+                  {minute}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Button Next */}
-      <button
-        className="mt-10 w-16 h-16 flex items-center justify-center bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 transition text-2xl"
-        onClick={() => navigate("/onboard/2")}
-      >
-        ➜
-      </button>
+      <div className="relative w-full max-w-xs mt-10 flex items-center justify-center">
+        {/* Back Button */}
+        <button
+          className="absolute left-0 text-gray-600 hover:text-black transition"
+          onClick={() => navigate("/")}
+        >
+          ← Back
+        </button>
+
+        {/* Next Button */}
+        <button
+          className="w-16 h-16 flex items-center justify-center bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 transition text-2xl"
+          onClick={() => navigate("/onboard/2")}
+        >
+          ➜
+        </button>
+      </div>
     </div>
   );
 };

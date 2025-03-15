@@ -6,7 +6,7 @@ export const deleteTask = async (taskId) => {
     const response = await api.delete(
       `${apiUrl}/task-management/tasks/${taskId}`
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("Error deleting task:", error);
     throw error.response?.data || error;

@@ -11,7 +11,9 @@ const config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {},
+      backgroundImage: {
+        "custom-gradient": "linear-gradient(to bottom, #1F91EE, #FC9F2E)",
+      },
 
       fontFamily: {
         poppins: ["var(--font-poppins)", "sans-serif"],

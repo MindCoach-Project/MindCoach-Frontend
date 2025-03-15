@@ -13,13 +13,13 @@ import { Button } from "../ui";
 import { Label } from "../ui";
 import { Textarea } from "../ui";
 import { Clock, X, Plus, Trash } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "../ui";
 import {
   createTask,
   updateTask,
@@ -28,11 +28,10 @@ import {
 } from "../../api/task";
 import { SubTaskModal } from "./SubTaskModal";
 import { TaskCompletionNotification } from "./TaskCompletionNotification";
-import { 
-  toVietnamTime, 
-  toISOStringUTC 
-} from "../../utils/TimezoneUtils";
+import { toVietnamTime, toISOStringUTC } from "../../utils/TimezoneUtils";
 import { format } from "date-fns";
+import { da } from "date-fns/locale/da";
+import { toast } from "react-toastify";
 
 export function EventModal({
   isOpen,
@@ -102,7 +101,9 @@ export function EventModal({
       }
     } else {
       // For new tasks, use local Vietnam time
-      const now = selectedTime ? toVietnamTime(selectedTime) : toVietnamTime(new Date());
+      const now = selectedTime
+        ? toVietnamTime(selectedTime)
+        : toVietnamTime(new Date());
       const later = new Date(now.getTime() + 60 * 60 * 1000);
 
       setTitle("");
@@ -117,7 +118,6 @@ export function EventModal({
     }
   }, [defaultValues, selectedTime]);
 
-  
   const handleAddSubtask = () => {
     setSelectedSubtask(null);
     setIsSubtaskModalOpen(true);
@@ -140,7 +140,9 @@ export function EventModal({
   const handleRemoveSubtask = async (taskId, subTaskId) => {
     try {
       if (taskId) {
-        await deleteSubTask(taskId, subTaskId);
+        const data = await deleteSubTask(taskId, subTaskId);
+        let message = "The subtask was deleted successfully!";
+        if (message) toast.success(message);
       }
       setSubtasks((prev) => prev.filter((st) => st.id !== subTaskId));
     } catch (error) {
@@ -150,7 +152,9 @@ export function EventModal({
 
   const handleRemoveTask = async (taskId) => {
     try {
-      await deleteTask(taskId);
+      const data = await deleteTask(taskId);
+      let message = "The task was deleted successfully!";
+      if (message) toast.success(message);
       onSubmit();
       onClose();
     } catch (error) {
@@ -186,15 +190,15 @@ export function EventModal({
 
     const processedSubtasks = subtasks.map((st) => {
       const isNewSubtask = !st.id.includes("-");
-      
+
       // For both new and existing subtasks, convert Vietnam time to UTC ISO string
       let startTimeUTC, endTimeUTC;
-      
-      if (isNewSubtask || typeof st.startTime === 'string') {
+
+      if (isNewSubtask || typeof st.startTime === "string") {
         // If it's a new subtask or the time is already a string, create proper Date objects
         const startDate = new Date(st.startTime);
         const endDate = new Date(st.endTime);
-        
+
         // Convert to UTC ISO strings
         startTimeUTC = toISOStringUTC(startDate);
         endTimeUTC = toISOStringUTC(endDate);
@@ -223,14 +227,19 @@ export function EventModal({
       endTime: toISOStringUTC(endDateTime),
       subTasks: processedSubtasks,
     };
-
+    let message = null;
     try {
       if (defaultValues?.id) {
-        await updateTask(defaultValues.id, eventData);
+        const data = await updateTask(defaultValues.id, eventData);
+        // message = data?.message;
+        message = "The task was updated successfully!";
       } else {
-        await createTask(eventData);
+        const data = await createTask(eventData);
+        // message = data?.message;
+        message = "The task was created successfully!";
       }
-
+      if (message) toast.success(message);
+      // setShowNotification(true);
       if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
         setShowNotification(true);
       }
@@ -330,9 +339,21 @@ export function EventModal({
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
-                  <div>
+                  <div className="flex flex-col">
                     <Label>Priority</Label>
-                    <Select value={priority} onValueChange={setPriority}>
+
+                    <select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value)}
+                      className="w-full px-3 py-2 my-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="high">High</option>
+                      <option value="medium">Medium</option>
+                      <option value="low">Low</option>
+                    </select>
+                  </div>
+
+                  {/* <Select value={priority} onValueChange={setPriority}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -341,11 +362,20 @@ export function EventModal({
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="low">Low</SelectItem>
                       </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
+                    </Select> */}
+                  <div className="flex flex-col">
                     <Label>Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full px-3 py-2 my-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="todo">To Do</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="done">Done</option>
+                    </select>
+                  </div>
+                  {/* <Select value={status} onValueChange={setStatus}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -354,8 +384,7 @@ export function EventModal({
                         <SelectItem value="inprogress">In Progress</SelectItem>
                         <SelectItem value="done">Done</SelectItem>
                       </SelectContent>
-                    </Select>
-                  </div>
+                    </Select> */}
                 </div>
 
                 <div>
