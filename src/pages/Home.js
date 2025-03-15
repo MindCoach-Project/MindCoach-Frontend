@@ -71,6 +71,8 @@ function Home() {
     setIsLoading(true);
     try {
       await fetchTasks();
+      setIsModalOpen(false); 
+    setSelectedTask(null);
     } catch (error) {
       console.error("Error updating tasks:", error);
     } finally {

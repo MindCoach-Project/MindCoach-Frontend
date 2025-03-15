@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import { Edit, Camera, LogOut } from "lucide-react";
 import EditProfileModal from "../components/Profile/EditProfileModal";
 import TaskStatusChart from "../components/Profile/TaskStatusChart";
@@ -8,6 +8,8 @@ import { site_path } from "../utils";
 import { getTrackingWeek } from "../api/task";
 
 const ProfilePage = () => {
+  const fileInputRef = useRef(null);
+
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -16,7 +18,12 @@ const ProfilePage = () => {
     const storedUser = localStorage.getItem("user");
     return storedUser
       ? JSON.parse(storedUser)
-      : { username: "John Doe", email: "john.doe@example.com", dateOfBirth: "", imageUrl: "/images/users/default-user" };
+      : {
+          username: "John Doe",
+          email: "john.doe@example.com",
+          dateOfBirth: "",
+          imageUrl: "/images/users/default-user",
+        };
   };
 
   const [profileData, setProfileData] = useState(getStoredProfile);
@@ -39,11 +46,31 @@ const ProfilePage = () => {
     setIsEditModalOpen(false);
   };
 
-  const handleImageChange = () => {
-    const imageId = Math.floor(Math.random() * 1000);
-    const updatedProfile = { ...profileData, imageUrl: `/api/placeholder/150/150?id=${imageId}` };
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if(!file) return
+
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "first_time_cloudiary");
+    data.append("cloud_name", "dzxszhmvr");
+
+    const res = await fetch("https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload", {
+      method: "POST",
+      body: data,
+    });
+    const uploadedUrlImage = await res.json();
+
+    console.log("url from cloudiary", uploadedUrlImage.url)
+
+    const updatedProfile = {
+      ...profileData,
+      imageUrl:uploadedUrlImage.url,
+    };
+
     setProfileData(updatedProfile);
-    localStorage.setItem("user", JSON.stringify(updatedProfile)); // 🔥 Cập nhật avatar vào localStorage
+
+    localStorage.setItem("user", JSON.stringify(updatedProfile)); 
   };
 
   const handleLogoutClick = () => {
@@ -59,7 +86,12 @@ const ProfilePage = () => {
         const fullWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         const formattedData = fullWeek.map((day) => {
           const found = apiData.find((item) => item.date === day);
-          return { day, "To Do": found ? found.toDo : 0, "In Progress": found ? found.inProgress : 0, Done: found ? found.done : 0 };
+          return {
+            day,
+            "To Do": found ? found.toDo : 0,
+            "In Progress": found ? found.inProgress : 0,
+            Done: found ? found.done : 0,
+          };
         });
 
         setTaskData(formattedData);
@@ -75,33 +107,52 @@ const ProfilePage = () => {
     <div>
       <div className="flex flex-row justify-between">
       <div className="relative">
-          <img
-            // src={profileData.profileImage}
-            src="https://cdn-icons-png.flaticon.com/512/8792/8792047.png"
-            alt="Profile"
-            className="w-28 h-28 rounded-full object-cover"
-          />
-          <button
-            onClick={handleImageChange}
-            className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
-          >
-            <Camera size={16} />
-          </button>
-        </div>
+  <img
+    src={profileData.imageUrl}
+    alt="Profile"
+    className="w-28 h-28 rounded-full object-cover"
+  />
+  
+  {/* Input file ẩn */}
+  <input
+    type="file"
+    accept="image/*"
+    ref={fileInputRef}
+    onChange={handleImageChange}
+    className="hidden"
+  />
+
+  {/* Nút Camera để mở input file */}
+  <button
+    onClick={() => fileInputRef.current.click()}
+    className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
+  >
+    <Camera size={16} />
+  </button>
+</div>
+
 
         <div className="flex flex-col">
           <div className="space-y-2">
             <h2 className="text-xl font-medium">{profileData.username}</h2>
             <p className="text-gray-600">
-              {profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toLocaleDateString() : "N/A"}
+              {profileData.dateOfBirth
+                ? new Date(profileData.dateOfBirth).toLocaleDateString()
+                : "N/A"}
             </p>
             <p className="text-gray-600">{profileData.email}</p>
             <div className="flex gap-2">
-              <Button onClick={handleEditClick} className="mt-4 flex items-center gap-1">
+              <Button
+                onClick={handleEditClick}
+                className="mt-4 flex items-center gap-1"
+              >
                 <Edit size={16} />
                 Update
               </Button>
-              <Button onClick={handleLogoutClick} className="mt-4 flex items-center gap-1 bg-gray-300 text-gray-800 hover:bg-gray-400">
+              <Button
+                onClick={handleLogoutClick}
+                className="mt-4 flex items-center gap-1 bg-gray-300 text-gray-800 hover:bg-gray-400"
+              >
                 <LogOut size={16} />
                 Logout
               </Button>
@@ -112,7 +163,13 @@ const ProfilePage = () => {
 
       <TaskStatusChart data={taskData} />
 
-      <EditProfileModal isOpen={isEditModalOpen} onClose={handleCloseModal} formData={formData} onChange={setFormData} onSubmit={handleFormSubmit} />
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseModal}
+        formData={formData}
+        onChange={setFormData}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 };

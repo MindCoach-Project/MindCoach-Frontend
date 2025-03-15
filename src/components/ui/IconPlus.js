@@ -10,7 +10,12 @@ export default function IconPlus({ onCalendarClick, onVoiceClick }) {
         className="w-[50px] h-[50px] flex items-center justify-center rounded-full bg-orange text-white shadow-md hover:bg-orange transition"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Plus size={40} />
+        <Plus
+          size={40}
+          className={`transition-transform duration-300 ${
+            isOpen ? "rotate-45" : "rotate-0"
+          }`}
+        />
       </button>
 
       {isOpen && (

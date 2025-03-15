@@ -39,7 +39,7 @@ export function TaskList({ tasks }) {
     <>
       {tasks.map((template) => (
         <div key={template.id} className="mb-4">
-          <h2 className="font-bold text-lg mb-2">{template.title}</h2>
+          <h2 className="font-regular text-brown text-lg mb-2">{template.title}</h2>
 
           <div className="border border-orange rounded-md p-3 grid grid-cols-2 gap-4">
             {template.tasks.length > 0 ? (

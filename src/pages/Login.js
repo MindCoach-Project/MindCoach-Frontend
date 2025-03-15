@@ -82,8 +82,7 @@ function Login() {
           onChange={handleChange}
           error={errors.password}
         />
-        <p className="text-left text-16 text-brown">Forgot password?</p>
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-12">
           <Button className="w-1/2" size="lg" type="submit">
             Sign In
           </Button>

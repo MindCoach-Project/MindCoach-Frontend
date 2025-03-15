@@ -1,54 +1,14 @@
 "use client";
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
-import { PushNotifications } from "@capacitor/push-notifications";
-import { isPlatform } from "@ionic/react";
-import { TaskCompletionNotification } from "../Task/TaskCompletionNotification";
 import { ReminderForm } from "./ReminderForm";
 const signalUrl = process.env.REACT_APP_SIGNALR_URL;
+
 export function ReminderNotificationManager() {
   const [notifications, setNotifications] = useState([]);
   const connectionRef = useRef(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Đăng ký Push Notifications khi ứng dụng chạy trên mobile
-  // useEffect(() => {
-  //   if (isPlatform("capacitor")) {
-  //     registerPushNotifications();
-  //   }
-  // }, []);
-
-  // const registerPushNotifications = async () => {
-  //   try {
-  //     if (!PushNotifications) return;
-
-  //     let permStatus = await PushNotifications.requestPermissions();
-  //     if (permStatus.receive === "granted") {
-  //       await PushNotifications.register();
-
-  //       PushNotifications.addListener("registration", async (token) => {
-  //         console.log("✅ Đăng ký thành công, token:", token.value);
-  //         localStorage.setItem("fcmToken", token.value);
-  //       });
-
-  //       PushNotifications.addListener("pushNotificationReceived", (notification) => {
-  //         console.log("📩 Nhận thông báo:", notification);
-  //         setNotifications((prev) => [...prev, { id: notification.id, body: notification.body }]);
-  //       });
-
-  //       PushNotifications.addListener("pushNotificationActionPerformed", (notification) => {
-  //         console.log("🛠 Hành động với thông báo:", notification);
-  //       });
-  //     } else {
-  //       console.warn("⚠️ Quyền thông báo bị từ chối");
-  //     }
-  //   } catch (error) {
-  //     console.error("❌ Lỗi khi đăng ký thông báo", error);
-  //   }
-  // };
-
-  // Thiết lập kết nối SignalR
   const establishConnection = useCallback(async () => {
     if (isConnecting || connectionRef.current) return;
     setIsConnecting(true);
@@ -89,8 +49,6 @@ export function ReminderNotificationManager() {
           { ...notification, id: notification.id || `reminder-${Date.now()}` },
         ]);
 
-        // Gửi thông báo đến Firebase khi app bị đóng
-        // await sendPushNotificationToFCM(notification.title, notification.startTime);
       });
 
       // Kết nối với SignalR
@@ -131,41 +89,10 @@ export function ReminderNotificationManager() {
       ) {
         await attemptReconnection();
       }
-    }, 30000);
+    }, 120000);
 
     return () => clearInterval(healthCheckInterval);
   }, [attemptReconnection]);
-
-  // Gửi thông báo đến Firebase khi ứng dụng bị đóng
-  // const sendPushNotificationToFCM = async (title, startTime) => {
-  //   const fcmToken = localStorage.getItem("fcmToken");
-  //   if (!fcmToken) {
-  //     console.warn("⚠️ Không tìm thấy FCM token");
-  //     return;
-  //   }
-
-  //   const message = {
-  //     to: fcmToken,
-  //     notification: {
-  //       title: title,
-  //       body: `Bắt đầu lúc: ${startTime}`,
-  //     },
-  //   };
-
-  //   try {
-  //     await fetch("https://fcm.googleapis.com/fcm/send", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: "key=YOUR_SERVER_KEY", // Thay YOUR_SERVER_KEY bằng Server Key từ Firebase
-  //       },
-  //       body: JSON.stringify(message),
-  //     });
-  //     console.log("✅ Đã gửi thông báo đến Firebase");
-  //   } catch (error) {
-  //     console.error("❌ Lỗi gửi thông báo đến Firebase", error);
-  //   }
-  // };
 
   const handleCloseNotification = useCallback((id) => {
     setNotifications((prev) =>
