@@ -5,6 +5,7 @@
   "android": {
     "allowMixedContent": true
   },
+  "bundledWebRuntime": false,
   "plugins": {
     "PushNotifications": {
       "presentationOptions": ["badge", "sound", "alert"]
@@ -12,11 +13,9 @@
     "FirebaseMessaging": {
       "presentationOptions": ["badge", "sound", "alert"]
     },
-    "SpeechRecognition": {
-      "androidPermissions": ["android.permission.RECORD_AUDIO"]
-    },
-    "Microphone": {
+    "VoiceRecorder": {
       "androidPermissions": ["android.permission.RECORD_AUDIO"]
     }
   }
 }
+

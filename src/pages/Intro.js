@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Logo, PageTitle } from "../components/ui";
 import { Link } from "react-router-dom";

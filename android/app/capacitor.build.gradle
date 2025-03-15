@@ -13,12 +13,15 @@ dependencies {
     implementation project(':capacitor-firebase-messaging')
     implementation project(':capacitor-app')
     implementation project(':capacitor-browser')
+    implementation project(':capacitor-filesystem')
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
     implementation project(':capacitor-local-notifications')
     implementation project(':capacitor-push-notifications')
     implementation project(':capacitor-status-bar')
+    implementation project(':capawesome-capacitor-file-picker')
     implementation project(':mozartec-capacitor-microphone')
+    implementation project(':capacitor-voice-recorder')
 
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Edit, Camera, LogOut } from "lucide-react";
 import EditProfileModal from "../components/Profile/EditProfileModal";
 import TaskStatusChart from "../components/Profile/TaskStatusChart";
@@ -19,10 +19,10 @@ const ProfilePage = () => {
     return storedUser
       ? JSON.parse(storedUser)
       : {
-          username: "John Doe",
-          email: "john.doe@example.com",
+          username: "Name example",
+          email: "name@example.com",
           dateOfBirth: "",
-          imageUrl: "/images/users/default-user",
+          imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
         };
   };
 
@@ -48,29 +48,32 @@ const ProfilePage = () => {
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if(!file) return
+    if (!file) return;
 
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "first_time_cloudiary");
     data.append("cloud_name", "dzxszhmvr");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload", {
-      method: "POST",
-      body: data,
-    });
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
     const uploadedUrlImage = await res.json();
 
-    console.log("url from cloudiary", uploadedUrlImage.url)
+    console.log("url from cloudiary", uploadedUrlImage.url);
 
     const updatedProfile = {
       ...profileData,
-      imageUrl:uploadedUrlImage.url,
+      imageUrl: uploadedUrlImage.url,
     };
 
     setProfileData(updatedProfile);
 
-    localStorage.setItem("user", JSON.stringify(updatedProfile)); 
+    localStorage.setItem("user", JSON.stringify(updatedProfile));
   };
 
   const handleLogoutClick = () => {
@@ -106,31 +109,30 @@ const ProfilePage = () => {
   return (
     <div>
       <div className="flex flex-row justify-between">
-      <div className="relative">
-  <img
-    src={profileData.imageUrl}
-    alt="Profile"
-    className="w-28 h-28 rounded-full object-cover"
-  />
-  
-  {/* Input file ẩn */}
-  <input
-    type="file"
-    accept="image/*"
-    ref={fileInputRef}
-    onChange={handleImageChange}
-    className="hidden"
-  />
+        <div className="relative">
+          <img
+            src={profileData.imageUrl}
+            alt="Profile"
+            className="w-28 h-28 rounded-full border-1 border-brown object-cover"
+          />
 
-  {/* Nút Camera để mở input file */}
-  <button
-    onClick={() => fileInputRef.current.click()}
-    className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
-  >
-    <Camera size={16} />
-  </button>
-</div>
+          {/* Input file ẩn */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            className="hidden"
+          />
 
+          {/* Nút Camera để mở input file */}
+          <button
+            onClick={() => fileInputRef.current.click()}
+            className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
+          >
+            <Camera size={16} />
+          </button>
+        </div>
 
         <div className="flex flex-col">
           <div className="space-y-2">
