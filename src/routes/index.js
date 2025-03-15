@@ -46,11 +46,11 @@ let publicRoutes = [
     component: OnBoard4,
     layout: LoginLayout,
   },
-  // {
-  //   path: site_path.ONBOARD5,
-  //   component: OnBoard5,
-  //   layout: LoginLayout,
-  // },
+  {
+    path: site_path.ONBOARD5,
+    component: OnBoard5,
+    layout: LoginLayout,
+  },
 ];
 let privateRoutes = [
   {
