@@ -36,11 +36,11 @@ let publicRoutes = [
     component: OnBoard2,
     layout: LoginLayout,
   },
-  // {
-  //   path: site_path.ONBOARD3,
-  //   component: OnBoard3,
-  //   layout: LoginLayout,
-  // },
+  {
+    path: site_path.ONBOARD3,
+    component: OnBoard3,
+    layout: LoginLayout,
+  },
   // {
   //   path: site_path.ONBOARD4,
   //   component: OnBoard4,
