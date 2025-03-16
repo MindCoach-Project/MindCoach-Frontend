@@ -1,20 +1,25 @@
 "use client";
 import { useState, useEffect } from "react";
 import { updateReminderOffset } from "../api/reminder";
-import { ArrowLeft, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "../components/ui";
 import { useNavigate } from "react-router-dom";
 import { site_path } from "../utils";
+import { ToastMessage } from "../components/ui";
+
 export default function ReminderPage() {
   const [selectedOffset, setSelectedOffset] = useState(null);
   const [currentOffset, setCurrentOffset] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({ type: "", message: "" });
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCurrentOffset(5);
-    setSelectedOffset(5);
+    const storedOffset = localStorage.getItem("reminderOffset");
+    const initialOffset = storedOffset ? parseInt(storedOffset, 10) : 5;
+
+    setCurrentOffset(initialOffset);
+    setSelectedOffset(initialOffset);
   }, []);
 
   const handleOffsetSelection = (minutes) => {
@@ -25,29 +30,27 @@ export default function ReminderPage() {
     if (!selectedOffset) return;
 
     setIsLoading(true);
-    setNotification({ type: "", message: "" });
 
     try {
       const result = await updateReminderOffset({
         reminderOffset: selectedOffset,
       });
+
       setCurrentOffset(result.reminderOffset);
-      setNotification({
-        type: "success",
-        message: "Reminder notification time updated successfully",
-      });
+      localStorage.setItem("reminderOffset", result.reminderOffset);
+
+      setToast({ type: "success", message: "Updated successfully" });
+
+      setTimeout(() => setToast(null), 3000);
     } catch (error) {
-      setNotification({
+      setToast({
         type: "error",
-        message: "Failed to update reminder settings. Please try again.",
+        message: "Failed to update reminder.",
       });
+
+      setTimeout(() => setToast(null), 3000);
     } finally {
       setIsLoading(false);
-
-      // Auto-hide notification after 5 seconds
-      setTimeout(() => {
-        setNotification({ type: "", message: "" });
-      }, 5000);
     }
   };
 
@@ -93,36 +96,21 @@ export default function ReminderPage() {
           </p>
         )}
 
-        {/* Notification */}
-        {notification.message && (
-          <div
-            className={`mb-4 p-3 rounded-md ${
-              notification.type === "success"
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-          >
-            <div className="flex items-center">
-              {notification.type === "success" ? (
-                <Check className="h-5 w-5 mr-2" />
-              ) : (
-                <AlertCircle className="h-5 w-5 mr-2" />
-              )}
-              <p className="text-sm">{notification.message}</p>
-            </div>
-          </div>
-        )}
-
         <div className="flex justify-center">
           <Button
             onClick={handleSave}
-            disabled={isLoading || selectedOffset === currentOffset}
-            className="w-1/2 mt-30 bg-[#028E89]"
+            className="w-1/2 mt-30 text-white px-4 py-2"
           >
             {isLoading ? "Updating..." : "Update"}
           </Button>
         </div>
       </div>
+
+      {toast && (
+        <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 w-4/5">
+          <ToastMessage type={toast.type} message={toast.message} />
+        </div>
+      )}
     </div>
   );
 }

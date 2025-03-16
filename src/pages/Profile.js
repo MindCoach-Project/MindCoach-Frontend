@@ -6,27 +6,29 @@ import { Button } from "../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import { site_path } from "../utils";
 import { getTrackingWeek } from "../api/task";
+import { Loading } from "../components/ui";
+import { useGlobalState } from "../global/state";
+import { actions } from "../global/state";
 
 const ProfilePage = () => {
   const fileInputRef = useRef(null);
-
   const navigate = useNavigate();
+  const { state, dispatch } = useGlobalState();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // ✅ Lấy profile từ localStorage khi load trang
+  const [isUploading, setIsUploading] = useState(false);
+  
   const getStoredProfile = () => {
     const storedUser = localStorage.getItem("user");
-    return storedUser
-      ? JSON.parse(storedUser)
-      : {
-          username: "Name example",
-          email: "name@example.com",
-          dateOfBirth: "",
-          imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
-        };
+    return storedUser ? JSON.parse(storedUser) : {
+      username: "Tran",
+      email: "name@example.com",
+      dateOfBirth: "20/04/2000",
+      imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
+    };
   };
 
   const [profileData, setProfileData] = useState(getStoredProfile);
+
   const [taskData, setTaskData] = useState([]);
   const [formData, setFormData] = useState({ ...profileData });
 
@@ -35,10 +37,10 @@ const ProfilePage = () => {
     setIsEditModalOpen(true);
   };
 
-  // ✅ Lưu dữ liệu vào localStorage khi user cập nhật profile
   const handleFormSubmit = (updatedData) => {
     setProfileData(updatedData);
-    localStorage.setItem("user", JSON.stringify(updatedData)); // 🔥 Lưu vào localStorage
+    localStorage.setItem("user", JSON.stringify(updatedData));
+    dispatch(actions.setUser(updatedData)); 
     setIsEditModalOpen(false);
   };
 
@@ -50,35 +52,35 @@ const ProfilePage = () => {
     const file = event.target.files[0];
     if (!file) return;
 
+    setIsUploading(true);
+
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "first_time_cloudiary");
     data.append("cloud_name", "dzxszhmvr");
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
-    const uploadedUrlImage = await res.json();
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload",
+        { method: "POST", body: data }
+      );
+      const uploadedUrlImage = await res.json();
 
-    console.log("url from cloudiary", uploadedUrlImage.url);
-
-    const updatedProfile = {
-      ...profileData,
-      imageUrl: uploadedUrlImage.url,
-    };
-
-    setProfileData(updatedProfile);
-
-    localStorage.setItem("user", JSON.stringify(updatedProfile));
+      const updatedProfile = { ...profileData, imageUrl: uploadedUrlImage.url };
+      setProfileData(updatedProfile);
+      localStorage.setItem("user", JSON.stringify(updatedProfile));
+      dispatch(actions.setUser(updatedProfile)); // Dispatch cập nhật ảnh
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleLogoutClick = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    dispatch(actions.setUser(null)); // Xóa user trong state
     setTimeout(() => navigate(site_path.INTRO), 1000);
   };
 
@@ -107,16 +109,23 @@ const ProfilePage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="relative">
       <div className="flex flex-row justify-between">
         <div className="relative">
-          <img
-            src={profileData.imageUrl}
-            alt="Profile"
-            className="w-28 h-28 rounded-full border-1 border-brown object-cover"
-          />
+          <div className="w-28 h-28 rounded-full border-1 border-brown overflow-hidden">
+            {isUploading ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                <Loading />
+              </div>
+            ) : (
+              <img
+                src={profileData.imageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
 
-          {/* Input file ẩn */}
           <input
             type="file"
             accept="image/*"
@@ -125,7 +134,6 @@ const ProfilePage = () => {
             className="hidden"
           />
 
-          {/* Nút Camera để mở input file */}
           <button
             onClick={() => fileInputRef.current.click()}
             className="absolute bottom-7 right-0 bg-aqua text-white p-2 rounded-full"
@@ -162,9 +170,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-
       <TaskStatusChart data={taskData} />
-
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
