@@ -19,4 +19,5 @@ export const site_path = {
      TEMPLATE_SPORT: '/template/sport',
      TEMPLATE_RELAX: '/template/relax',
      REMINDER: '/reminder',
+     BLOG_DETAIL: '/blog/:url',
 };

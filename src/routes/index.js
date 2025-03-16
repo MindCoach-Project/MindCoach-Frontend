@@ -1,4 +1,5 @@
 import { Home, Intro, ListTasks, Profile, TaskStatusPage, WorkTemplate, HouseholdTemplate, SportTemplate, RelaxTemplate, Reminder } from "../pages";
+import { BlogDetail } from "../components";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
@@ -66,7 +67,13 @@ let privateRoutes = [
     component: Reminder,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
-  }
+  }, 
+  {
+    path: site_path.BLOG_DETAIL, 
+    component: BlogDetail,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
 ];
 
 files.keys().forEach((fileName) => {

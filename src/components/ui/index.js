@@ -32,3 +32,4 @@ export { Textarea } from "./Textarea";
 export { Separator } from "./Separator";
 export { Badge, badgeVariants } from "./Badge";
 export { default as ToastMessage } from "./ToastMessage";
+export { default as Loading } from "./Loading";
