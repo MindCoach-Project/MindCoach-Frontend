@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OnBoard1 = () => {
+const OnBoard2 = () => {
   const navigate = useNavigate();
   const hours = Array.from({ length: 24 }, (_, i) =>
     (i + 1).toString().padStart(2, "0")
@@ -16,7 +16,6 @@ const OnBoard1 = () => {
   const hourRef = useRef(null);
   const minuteRef = useRef(null);
   const itemHeight = 50;
-
   useEffect(() => {
     scrollToSelected(hourRef, hours.indexOf(selectedHour));
     scrollToSelected(minuteRef, minutes.indexOf(selectedMinute));
@@ -43,17 +42,17 @@ const OnBoard1 = () => {
           <div
             key={i}
             className={`w-3 h-3 rounded-full ${
-              i === 0 ? "bg-black" : "bg-gray-300"
+              i === 1 ? "bg-black" : "bg-gray-300"
             }`}
           />
         ))}
       </div>
 
       <h2 className="text-white text-3xl font-semibold mt-2 text-center">
-        What time do you usually start the day?
+        What time do you go to bed?
       </h2>
 
-      <img src="/assets/images/sun.png" alt="Sun" className="w-50 h-15 mt-4" />
+      <img src="/assets/images/moon.png" alt="Sun" className="w-50 h-15 mt-4" />
 
       {/* Time Picker */}
       <div className="relative flex items-center space-x-2 mt-6">
@@ -114,7 +113,7 @@ const OnBoard1 = () => {
         {/* Back Button */}
         <button
           className="absolute left-0 text-gray-600 hover:text-black transition"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/onboard/1")}
         >
           ← Back
         </button>
@@ -122,7 +121,7 @@ const OnBoard1 = () => {
         {/* Next Button */}
         <button
           className="w-16 h-16 flex items-center justify-center bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 transition text-2xl"
-          onClick={() => navigate("/onboard/2")}
+          onClick={() => navigate("/onboard/3")}
         >
           ➜
         </button>
@@ -131,4 +130,4 @@ const OnBoard1 = () => {
   );
 };
 
-export default OnBoard1;
+export default OnBoard2;

@@ -22,7 +22,7 @@ export function VoiceRecordingModal({ isOpen, onClose }) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition()
-        recognitionRef.current.lang = "vi-VN"
+        recognitionRef.current.lang = "en-US"
         recognitionRef.current.continuous = false
         recognitionRef.current.interimResults = false
       }
@@ -97,7 +97,7 @@ export function VoiceRecordingModal({ isOpen, onClose }) {
               setIsRecording(false)
             },
             {
-              language: "vi-VN",
+              language: "en-US",
               showPopup: true,
               showPartial: false,
             },

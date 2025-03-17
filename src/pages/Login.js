@@ -53,6 +53,7 @@ function Login() {
       dispatch(actions.setUser(data));
 
       setTimeout(() => navigate(site_path.HOME), 1000);
+      localStorage.setItem("firstLogin", true);
     } catch (error) {
       const errorMessage = "Invalid email or password.";
       setErrors({ email: errorMessage, password: errorMessage });

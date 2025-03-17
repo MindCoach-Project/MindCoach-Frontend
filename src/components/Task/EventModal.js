@@ -7,13 +7,12 @@ import { Button } from "../ui"
 import { Label } from "../ui"
 import { Textarea } from "../ui"
 import { Clock, X, Plus, Trash } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui"
 import { createTask, updateTask, deleteSubTask, deleteTask } from "../../api/task"
 import { SubTaskModal } from "./SubTaskModal"
 import { TaskCompletionNotification } from "./TaskCompletionNotification"
-import ToastMessage from "../ui/ToastMessage"
 import { toVietnamTime, toISOStringUTC } from "../../utils/TimezoneUtils"
 import { format } from "date-fns"
+import { useToast } from "./ToastConfig";
 
 export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedTime, isLoading }) {
   const [title, setTitle] = useState("")
@@ -27,12 +26,12 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
   const [subtasks, setSubtasks] = useState([])
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false)
   const [selectedSubtask, setSelectedSubtask] = useState(null)
-  const [toast, setToast] = useState(null)
+  const [error, setError] = useState("")
   const [showNotification, setShowNotification] = useState(false)
   const [modalVisible, setModalVisible] = useState(isOpen)
 
-  const [titleError, setTitleError] = useState("")
-  const [timeError, setTimeError] = useState("")
+  // Use the toast hook
+  const toast = useToast()
 
   useEffect(() => {
     setModalVisible(isOpen)
@@ -96,7 +95,7 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
     setTimeout(() => {
       setModalVisible(false)
       onClose()
-    }, 5000) // 1.5 second delay to show toast
+    }, 500) // 0.5 second delay to show toast
   }
 
   const handleAddSubtask = () => {
@@ -117,10 +116,11 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
       return [...prev, { ...subtaskData, id: Date.now().toString() }]
     })
 
-    setToast({
-      type: "success",
-      message: subtaskData.id ? "Subtask updated successfully" : "Subtask added successfully",
-    })
+    if (subtaskData.id) {
+      toast.success("Subtask updated successfully")
+    } else {
+      toast.success("Subtask added successfully")
+    }
   }
 
   const handleRemoveSubtask = async (taskId, subTaskId) => {
@@ -129,45 +129,44 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
         await deleteSubTask(taskId, subTaskId)
       }
       setSubtasks((prev) => prev.filter((st) => st.id !== subTaskId))
-      setToast({ type: "success", message: "Subtask deleted successfully" })
+      toast.success("Subtask deleted successfully")
     } catch (error) {
       console.error("Error deleting subtask:", error)
-      setToast({ type: "error", message: "Failed to delete subtask" })
+      toast.error("Failed to delete subtask")
+      setError("Failed to delete subtask")
     }
   }
 
   const handleRemoveTask = async (taskId) => {
     try {
       await deleteTask(taskId)
-      setToast({ type: "success", message: "Task deleted successfully" })
-
-      // Use delayed close instead of immediate close
+      toast.success("Task deleted successfully")
       handleDelayedClose()
       onSubmit()
     } catch (error) {
       console.error("Error deleting task:", error)
-      setToast({ type: "error", message: "Failed to delete task" })
+      toast.error("Failed to delete task")
+      setError("Failed to delete task")
     }
   }
 
   const validateForm = () => {
-    let isValid = true
+    const isValid = true
 
-    // Reset error messages
-    setTitleError("")
-    setTimeError("")
-
-    if (!title.trim()) {
-      setTitleError("Title is required.")
-      isValid = false
-    }
+    // Reset error message
+    setError("")
 
     const start = new Date(`${startDate}T${startTime}:00`)
     const end = new Date(`${endDate}T${endTime}:00`)
 
     if (end <= start) {
-      setTimeError("End time must be after start time.")
-      isValid = false
+      setError("End time must be after start time")
+      return false
+    }
+
+    if (!title.trim()) {
+      setError("Title is required")
+      return false
     }
 
     return isValid
@@ -224,25 +223,28 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
     try {
       if (defaultValues?.id) {
         await updateTask(defaultValues.id, eventData)
-        setToast({ type: "success", message: "Task updated successfully" })
+        toast.success("Task updated successfully")
+
+        // Force the parent component to refresh with the updated data
+        // This ensures the UI reflects the new status
+        if (typeof onSubmit === "function") {
+          onSubmit({ ...defaultValues, status: status })
+        }
       } else {
         await createTask(eventData)
-        setToast({ type: "success", message: "Task created successfully" })
+        toast.success("Task created successfully")
       }
 
       if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
         setShowNotification(true)
       }
 
-      // Use delayed close instead of immediate close
       handleDelayedClose()
       onSubmit()
     } catch (error) {
       console.error("Error saving task:", error)
-      setToast({
-        type: "error",
-        message: defaultValues?.id ? "Error updating task" : "Error creating task",
-      })
+      toast.error(error.message || "Error saving task")
+      setError(error.message || "Error saving task")
     }
   }
 
@@ -284,19 +286,17 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
             </div>
           ) : (
             <>
+              {error && <div className="bg-red-50 text-red-900 px-4 py-2 rounded-md mb-4">{error}</div>}
+
               <form onSubmit={handleSubmit} className="space-y-2">
                 <div>
                   <Label>Title</Label>
                   <Input
                     value={title}
-                    onChange={(e) => {
-                      setTitle(e.target.value)
-                      if (e.target.value.trim()) setTitleError("")
-                    }}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter task title"
                     required
                   />
-                  {titleError && <p className="text-red-500 text-sm">{titleError}</p>}
                 </div>
 
                 <div>
@@ -315,54 +315,42 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
                         <Input
                           type="date"
                           value={endDate}
-                          onChange={(e) => {
-                            setEndDate(e.target.value)
-                            setTimeError("")
-                          }}
+                          onChange={(e) => setEndDate(e.target.value)}
                           min={startDate}
                           required
                         />
-                        <Input
-                          type="time"
-                          value={endTime}
-                          onChange={(e) => {
-                            setEndTime(e.target.value)
-                            setTimeError("")
-                          }}
-                          required
-                        />
+                        <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
                       </div>
                     </div>
                   </div>
-                  {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
-                  <div>
+                  <div className="flex flex-col">
                     <Label>Priority</Label>
-                    <Select value={priority} onValueChange={setPriority}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                    <select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value)}
+                      className="w-full px-3 py-2 my-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="high">High</option>
+                      <option value="medium">Medium</option>
+                      <option value="low">Low</option>
+                    </select>
                   </div>
-                  <div>
+
+                  <div className="flex flex-col">
                     <Label>Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="inprogress">In Progress</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full px-3 py-2 my-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="todo">To Do</option>
+                      <option value="inprogress">In Progress</option>
+                      <option value="done">Done</option>
+                    </select>
                   </div>
                 </div>
 
@@ -438,9 +426,6 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
       />
 
       <TaskCompletionNotification isOpen={showNotification} onClose={() => setShowNotification(false)} />
-
-      {/* Toast message outside the modal so it persists */}
-      {toast && <ToastMessage type={toast.type} message={toast.message} />}
     </>
   )
 }

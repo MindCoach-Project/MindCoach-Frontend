@@ -2,9 +2,19 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Logo, PageTitle } from "../components/ui";
 import { Link } from "react-router-dom";
+import { site_path } from "../utils";
 const Intro = () => {
   const navigate = useNavigate();
-
+  const handleGetStarted = () => {
+    const isFirstLogin = JSON.parse(
+      localStorage.getItem("firstLogin") || "false"
+    );
+    if (!isFirstLogin) {
+      navigate("/onboard/1");
+    } else {
+      navigate(site_path.LOGIN);
+    }
+  };
   //   useEffect(() => {
   //     const hasSeenIntro = localStorage.getItem("hasSeenIntro");
 
@@ -32,8 +42,8 @@ const Intro = () => {
         alt="image intro"
         width={240}
       />
-      <Button size="lg">
-        <Link to="/login">Get started</Link>
+      <Button onClick={handleGetStarted} size="lg">
+        <Link href="#">Get started</Link>
       </Button>
     </div>
   );
