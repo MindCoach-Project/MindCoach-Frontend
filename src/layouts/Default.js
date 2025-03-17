@@ -1,6 +1,6 @@
 import Header from "./Header";
 import Navigation from "./Navigation";
-
+import { ToastProvider } from "../components/Task/ToastConfig";
 function Default({ children }) {
   return (
     <div className="relative flex flex-col h-screen bg-white shadow-md">
@@ -13,7 +13,10 @@ function Default({ children }) {
 
       {/* Main content with scrollable area */}
       <div className="flex-1 pt-20 pb-16 overflow-y-auto scrollbar-hide">
-        <div className="container mx-auto">{children}</div>
+        <div className="container mx-auto">
+          {" "}
+          <ToastProvider>{children}</ToastProvider>
+        </div>
       </div>
 
       {/* Fixed navigation */}

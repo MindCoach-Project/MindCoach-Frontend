@@ -9,7 +9,7 @@ import ToastMessage from "../components/ui/ToastMessage";
 import { loginUser } from "../api/auth/login";
 
 function Login() {
-  const {state, dispatch} = useGlobalState();
+  const { state, dispatch } = useGlobalState();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -26,7 +26,6 @@ function Login() {
       navigate(site_path.HOME);
     }
   }, [navigate]);
-
 
   const saveUserToLocalStorage = ({ token, username, email, imageUrl }) => {
     localStorage.setItem("token", token);
@@ -51,6 +50,7 @@ function Login() {
       dispatch(actions.setUser(data));
 
       setTimeout(() => navigate(site_path.HOME), 1000);
+      localStorage.setItem("firstLogin", true);
     } catch (error) {
       const errorMessage = "Invalid email or password.";
       setErrors({ email: errorMessage, password: errorMessage });

@@ -14,6 +14,9 @@ import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
 import OnBoard1 from "../components/Onboarding/Step1";
 import OnBoard2 from "../components/Onboarding/Step2";
+import OnBoard3 from "../components/Onboarding/Step3";
+import OnBoard4 from "../components/Onboarding/Step4";
+import OnBoard5 from "../components/Onboarding/Step5";
 
 const files = require.context(".", false, /\.js$/);
 
@@ -35,8 +38,18 @@ let publicRoutes = [
   },
   {
     path: site_path.ONBOARD3,
-    // component: Intro,
-    // layout: LoginLayout,
+    component: OnBoard3,
+    layout: LoginLayout,
+  },
+  {
+    path: site_path.ONBOARD4,
+    component: OnBoard4,
+    layout: LoginLayout,
+  },
+  {
+    path: site_path.ONBOARD5,
+    component: OnBoard5,
+    layout: LoginLayout,
   },
 ];
 let privateRoutes = [
