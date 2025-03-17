@@ -89,7 +89,7 @@ export function ReminderNotificationManager() {
       ) {
         await attemptReconnection();
       }
-    }, 120000);
+    }, 2000);
 
     return () => clearInterval(healthCheckInterval);
   }, [attemptReconnection]);

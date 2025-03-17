@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogClose,
 } from "../ui";
-import { Button } from "../ui";
 import { formatVietnamDate } from "../../utils/TimezoneUtils";
 const formatTime = (dateString) => {
   if (!dateString) return "";
@@ -89,7 +88,7 @@ export function ReminderForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-inherit">
         <DialogHeader>
           <DialogTitle className="text-center text-green-700 relative">
             {showSubtasksOnly ? "Upcoming Subtask" : "Reminder"}

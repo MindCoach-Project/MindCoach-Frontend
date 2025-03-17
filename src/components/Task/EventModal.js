@@ -1,207 +1,204 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "../ui";
-import { Input } from "../ui";
-import { Button } from "../ui";
-import { Label } from "../ui";
-import { Textarea } from "../ui";
-import { Clock, X, Plus, Trash } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui";
-import {
-  createTask,
-  updateTask,
-  deleteSubTask,
-  deleteTask,
-} from "../../api/task";
-import { SubTaskModal } from "./SubTaskModal";
-import { TaskCompletionNotification } from "./TaskCompletionNotification";
-import { 
-  toVietnamTime, 
-  toISOStringUTC 
-} from "../../utils/TimezoneUtils";
-import { format } from "date-fns";
+import { useState, useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "../ui"
+import { Input } from "../ui"
+import { Button } from "../ui"
+import { Label } from "../ui"
+import { Textarea } from "../ui"
+import { Clock, X, Plus, Trash } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui"
+import { createTask, updateTask, deleteSubTask, deleteTask } from "../../api/task"
+import { SubTaskModal } from "./SubTaskModal"
+import { TaskCompletionNotification } from "./TaskCompletionNotification"
+import ToastMessage from "../ui/ToastMessage"
+import { toVietnamTime, toISOStringUTC } from "../../utils/TimezoneUtils"
+import { format } from "date-fns"
 
-export function EventModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  defaultValues,
-  selectedTime,
-  isLoading,
-}) {
-  const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [priority, setPriority] = useState("medium");
-  const [status, setStatus] = useState("todo");
-  const [description, setDescription] = useState("");
-  const [subtasks, setSubtasks] = useState([]);
-  const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
-  const [selectedSubtask, setSelectedSubtask] = useState(null);
-  const [error, setError] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
+export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedTime, isLoading }) {
+  const [title, setTitle] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endDate, setEndDate] = useState("")
+  const [endTime, setEndTime] = useState("")
+  const [priority, setPriority] = useState("medium")
+  const [status, setStatus] = useState("todo")
+  const [description, setDescription] = useState("")
+  const [subtasks, setSubtasks] = useState([])
+  const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false)
+  const [selectedSubtask, setSelectedSubtask] = useState(null)
+  const [toast, setToast] = useState(null)
+  const [showNotification, setShowNotification] = useState(false)
+  const [modalVisible, setModalVisible] = useState(isOpen)
+
+  const [titleError, setTitleError] = useState("")
+  const [timeError, setTimeError] = useState("")
+
+  useEffect(() => {
+    setModalVisible(isOpen)
+  }, [isOpen])
 
   useEffect(() => {
     if (defaultValues) {
-      setTitle(defaultValues.title || "");
-      setPriority(defaultValues.priority?.toLowerCase() || "medium");
-      setStatus(defaultValues.status?.toLowerCase() || "todo");
-      setDescription(defaultValues.description || "");
+      setTitle(defaultValues.title || "")
+      setPriority(defaultValues.priority?.toLowerCase() || "medium")
+      setStatus(defaultValues.status?.toLowerCase() || "todo")
+      setDescription(defaultValues.description || "")
 
       if (defaultValues.subtasks && Array.isArray(defaultValues.subtasks)) {
-        const existingSubtaskIds = new Set(subtasks.map((st) => st.id));
-        const newSubtasks = defaultValues.subtasks.filter(
-          (st) => !existingSubtaskIds.has(st.id)
-        );
+        const existingSubtaskIds = new Set(subtasks.map((st) => st.id))
+        const newSubtasks = defaultValues.subtasks.filter((st) => !existingSubtaskIds.has(st.id))
 
         if (subtasks.length === 0) {
-          setSubtasks(defaultValues.subtasks);
+          setSubtasks(defaultValues.subtasks)
         } else if (newSubtasks.length > 0) {
-          setSubtasks((prev) => [...prev, ...newSubtasks]);
+          setSubtasks((prev) => [...prev, ...newSubtasks])
         }
       } else {
-        setSubtasks([]);
+        setSubtasks([])
       }
 
       // Parse the dates - they are already converted to Vietnam time in ListTasks.js
-      const startDateTime = defaultValues.start
-        ? new Date(defaultValues.start)
-        : new Date();
-      const endDateTime = defaultValues.end
-        ? new Date(defaultValues.end)
-        : new Date();
+      const startDateTime = defaultValues.start ? new Date(defaultValues.start) : new Date()
+      const endDateTime = defaultValues.end ? new Date(defaultValues.end) : new Date()
 
-      setStartDate(format(startDateTime, "yyyy-MM-dd"));
-      setStartTime(format(startDateTime, "HH:mm"));
-      setEndDate(format(endDateTime, "yyyy-MM-dd"));
-      setEndTime(format(endDateTime, "HH:mm"));
+      setStartDate(format(startDateTime, "yyyy-MM-dd"))
+      setStartTime(format(startDateTime, "HH:mm"))
+      setEndDate(format(endDateTime, "yyyy-MM-dd"))
+      setEndTime(format(endDateTime, "HH:mm"))
 
       if (defaultValues.selectedSubtaskId) {
-        const subtask = defaultValues.subtasks.find(
-          (st) => st.id === defaultValues.selectedSubtaskId
-        );
+        const subtask = defaultValues.subtasks.find((st) => st.id === defaultValues.selectedSubtaskId)
         if (subtask) {
-          setSelectedSubtask(subtask);
-          setIsSubtaskModalOpen(true);
+          setSelectedSubtask(subtask)
+          setIsSubtaskModalOpen(true)
         }
       }
     } else {
       // For new tasks, use local Vietnam time
-      const now = selectedTime ? toVietnamTime(selectedTime) : toVietnamTime(new Date());
-      const later = new Date(now.getTime() + 60 * 60 * 1000);
+      const now = selectedTime ? toVietnamTime(selectedTime) : toVietnamTime(new Date())
+      const later = new Date(now.getTime() + 60 * 60 * 1000)
 
-      setTitle("");
-      setPriority("medium");
-      setStatus("todo");
-      setDescription("");
-      setSubtasks([]);
-      setStartDate(format(now, "yyyy-MM-dd"));
-      setStartTime(format(now, "HH:mm"));
-      setEndDate(format(later, "yyyy-MM-dd"));
-      setEndTime(format(later, "HH:mm"));
+      setTitle("")
+      setPriority("medium")
+      setStatus("todo")
+      setDescription("")
+      setSubtasks([])
+      setStartDate(format(now, "yyyy-MM-dd"))
+      setStartTime(format(now, "HH:mm"))
+      setEndDate(format(later, "yyyy-MM-dd"))
+      setEndTime(format(later, "HH:mm"))
     }
-  }, [defaultValues, selectedTime]);
+  }, [defaultValues, selectedTime])
 
-  
+  // Custom close function with delay
+  const handleDelayedClose = () => {
+    setTimeout(() => {
+      setModalVisible(false)
+      onClose()
+    }, 5000) // 1.5 second delay to show toast
+  }
+
   const handleAddSubtask = () => {
-    setSelectedSubtask(null);
-    setIsSubtaskModalOpen(true);
-  };
+    setSelectedSubtask(null)
+    setIsSubtaskModalOpen(true)
+  }
 
   const handleEditSubtask = (subtask) => {
-    setSelectedSubtask(subtask);
-    setIsSubtaskModalOpen(true);
-  };
+    setSelectedSubtask(subtask)
+    setIsSubtaskModalOpen(true)
+  }
 
   const handleSubtaskSubmit = (subtaskData) => {
     setSubtasks((prev) => {
       if (subtaskData.id) {
-        return prev.map((st) => (st.id === subtaskData.id ? subtaskData : st));
+        return prev.map((st) => (st.id === subtaskData.id ? subtaskData : st))
       }
-      return [...prev, { ...subtaskData, id: Date.now().toString() }];
-    });
-  };
+      return [...prev, { ...subtaskData, id: Date.now().toString() }]
+    })
+
+    setToast({
+      type: "success",
+      message: subtaskData.id ? "Subtask updated successfully" : "Subtask added successfully",
+    })
+  }
 
   const handleRemoveSubtask = async (taskId, subTaskId) => {
     try {
       if (taskId) {
-        await deleteSubTask(taskId, subTaskId);
+        await deleteSubTask(taskId, subTaskId)
       }
-      setSubtasks((prev) => prev.filter((st) => st.id !== subTaskId));
+      setSubtasks((prev) => prev.filter((st) => st.id !== subTaskId))
+      setToast({ type: "success", message: "Subtask deleted successfully" })
     } catch (error) {
-      setError("Failed to delete subtask");
+      console.error("Error deleting subtask:", error)
+      setToast({ type: "error", message: "Failed to delete subtask" })
     }
-  };
+  }
 
   const handleRemoveTask = async (taskId) => {
     try {
-      await deleteTask(taskId);
-      onSubmit();
-      onClose();
+      await deleteTask(taskId)
+      setToast({ type: "success", message: "Task deleted successfully" })
+
+      // Use delayed close instead of immediate close
+      handleDelayedClose()
+      onSubmit()
     } catch (error) {
-      setError("Failed to delete task");
+      console.error("Error deleting task:", error)
+      setToast({ type: "error", message: "Failed to delete task" })
     }
-  };
+  }
 
   const validateForm = () => {
-    const start = new Date(`${startDate}T${startTime}:00`);
-    const end = new Date(`${endDate}T${endTime}:00`);
+    let isValid = true
 
-    if (end <= start) {
-      setError("End time must be after start time");
-      return false;
-    }
+    // Reset error messages
+    setTitleError("")
+    setTimeError("")
 
     if (!title.trim()) {
-      setError("Title is required");
-      return false;
+      setTitleError("Title is required.")
+      isValid = false
     }
 
-    setError("");
-    return true;
-  };
+    const start = new Date(`${startDate}T${startTime}:00`)
+    const end = new Date(`${endDate}T${endTime}:00`)
+
+    if (end <= start) {
+      setTimeError("End time must be after start time.")
+      isValid = false
+    }
+
+    return isValid
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    e.preventDefault()
+    if (!validateForm()) return
 
     // Create Date objects in local Vietnam time
-    const startDateTime = new Date(`${startDate}T${startTime}:00`);
-    const endDateTime = new Date(`${endDate}T${endTime}:00`);
+    const startDateTime = new Date(`${startDate}T${startTime}:00`)
+    const endDateTime = new Date(`${endDate}T${endTime}:00`)
 
     const processedSubtasks = subtasks.map((st) => {
-      const isNewSubtask = !st.id.includes("-");
-      
+      const isNewSubtask = !st.id.includes("-")
+
       // For both new and existing subtasks, convert Vietnam time to UTC ISO string
-      let startTimeUTC, endTimeUTC;
-      
-      if (isNewSubtask || typeof st.startTime === 'string') {
+      let startTimeUTC, endTimeUTC
+
+      if (isNewSubtask || typeof st.startTime === "string") {
         // If it's a new subtask or the time is already a string, create proper Date objects
-        const startDate = new Date(st.startTime);
-        const endDate = new Date(st.endTime);
-        
+        const startDate = new Date(st.startTime)
+        const endDate = new Date(st.endTime)
+
         // Convert to UTC ISO strings
-        startTimeUTC = toISOStringUTC(startDate);
-        endTimeUTC = toISOStringUTC(endDate);
+        startTimeUTC = toISOStringUTC(startDate)
+        endTimeUTC = toISOStringUTC(endDate)
       } else {
         // The startTime and endTime are already Date objects
-        startTimeUTC = toISOStringUTC(st.startTime);
-        endTimeUTC = toISOStringUTC(st.endTime);
+        startTimeUTC = toISOStringUTC(st.startTime)
+        endTimeUTC = toISOStringUTC(st.endTime)
       }
 
       return {
@@ -211,8 +208,8 @@ export function EventModal({
         endTime: endTimeUTC,
         description: st.description || "",
         status: st.status || "todo",
-      };
-    });
+      }
+    })
 
     const eventData = {
       title,
@@ -222,28 +219,44 @@ export function EventModal({
       startTime: toISOStringUTC(startDateTime),
       endTime: toISOStringUTC(endDateTime),
       subTasks: processedSubtasks,
-    };
+    }
 
     try {
       if (defaultValues?.id) {
-        await updateTask(defaultValues.id, eventData);
+        await updateTask(defaultValues.id, eventData)
+        setToast({ type: "success", message: "Task updated successfully" })
       } else {
-        await createTask(eventData);
+        await createTask(eventData)
+        setToast({ type: "success", message: "Task created successfully" })
       }
 
       if ((defaultValues?.prevStatus ?? "") !== "done" && status === "done") {
-        setShowNotification(true);
+        setShowNotification(true)
       }
 
-      onSubmit();
+      // Use delayed close instead of immediate close
+      handleDelayedClose()
+      onSubmit()
     } catch (error) {
-      setError(error.message || "Error saving task");
+      console.error("Error saving task:", error)
+      setToast({
+        type: "error",
+        message: defaultValues?.id ? "Error updating task" : "Error creating task",
+      })
     }
-  };
+  }
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog
+        open={modalVisible}
+        onOpenChange={(open) => {
+          if (!open) {
+            setModalVisible(false)
+            onClose()
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[425px] bg-inherit">
           <DialogHeader>
             <DialogTitle>
@@ -271,21 +284,19 @@ export function EventModal({
             </div>
           ) : (
             <>
-              {error && (
-                <div className="bg-red-50 text-red-900 px-4 py-2 rounded-md mb-4">
-                  {error}
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-2">
                 <div>
                   <Label>Title</Label>
                   <Input
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value)
+                      if (e.target.value.trim()) setTitleError("")
+                    }}
                     placeholder="Enter task title"
                     required
                   />
+                  {titleError && <p className="text-red-500 text-sm">{titleError}</p>}
                 </div>
 
                 <div>
@@ -294,18 +305,8 @@ export function EventModal({
                     <div>
                       <Label>Start</Label>
                       <div className="grid grid-cols-2 gap-1">
-                        <Input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          required
-                        />
-                        <Input
-                          type="time"
-                          value={startTime}
-                          onChange={(e) => setStartTime(e.target.value)}
-                          required
-                        />
+                        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                        <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
                       </div>
                     </div>
                     <div>
@@ -314,19 +315,26 @@ export function EventModal({
                         <Input
                           type="date"
                           value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
+                          onChange={(e) => {
+                            setEndDate(e.target.value)
+                            setTimeError("")
+                          }}
                           min={startDate}
                           required
                         />
                         <Input
                           type="time"
                           value={endTime}
-                          onChange={(e) => setEndTime(e.target.value)}
+                          onChange={(e) => {
+                            setEndTime(e.target.value)
+                            setTimeError("")
+                          }}
                           required
                         />
                       </div>
                     </div>
                   </div>
+                  {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
@@ -379,36 +387,23 @@ export function EventModal({
 
                   <div className="space-y-2 max-h-[200px] overflow-y-auto">
                     {subtasks.map((subtask) => (
-                      <div
-                        key={subtask.id}
-                        className="flex items-center gap-2 group"
-                      >
+                      <div key={subtask.id} className="flex items-center gap-2 group">
                         <div className="flex-1 p-2 border rounded-md">
                           <div className="font-medium">{subtask.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {format(
-                              new Date(subtask.startTime),
-                              "MMM d, HH:mm"
-                            )}{" "}
-                            -{format(new Date(subtask.endTime), "HH:mm")}
+                            {format(new Date(subtask.startTime), "MMM d, HH:mm")} -
+                            {format(new Date(subtask.endTime), "HH:mm")}
                           </div>
                         </div>
                         <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditSubtask(subtask)}
-                          >
+                          <Button type="button" variant="ghost" size="icon" onClick={() => handleEditSubtask(subtask)}>
                             <Clock className="h-4 w-4" />
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            onClick={() =>
-                              handleRemoveSubtask(defaultValues?.id, subtask.id)
-                            }
+                            onClick={() => handleRemoveSubtask(defaultValues?.id, subtask.id)}
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -417,12 +412,7 @@ export function EventModal({
                     ))}
                   </div>
 
-                  <Button
-                    type="button"
-                    variant="noborder"
-                    className="w-full"
-                    onClick={handleAddSubtask}
-                  >
+                  <Button type="button" variant="noborder" className="w-full" onClick={handleAddSubtask}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Subtask
                   </Button>
@@ -432,9 +422,7 @@ export function EventModal({
                   <Button type="button" variant="outline" onClick={onClose}>
                     Cancel
                   </Button>
-                  <Button type="submit">
-                    {defaultValues ? "Update Task" : "Create Task"}
-                  </Button>
+                  <Button type="submit">{defaultValues ? "Update Task" : "Create Task"}</Button>
                 </div>
               </form>
             </>
@@ -449,10 +437,11 @@ export function EventModal({
         defaultValues={selectedSubtask}
       />
 
-      <TaskCompletionNotification
-        isOpen={showNotification}
-        onClose={() => setShowNotification(false)}
-      />
+      <TaskCompletionNotification isOpen={showNotification} onClose={() => setShowNotification(false)} />
+
+      {/* Toast message outside the modal so it persists */}
+      {toast && <ToastMessage type={toast.type} message={toast.message} />}
     </>
-  );
+  )
 }
+

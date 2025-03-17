@@ -111,7 +111,7 @@ function Register() {
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Signing Up..." : "Sign Up"}
+            {isLoading ? "Signing Up" : "Sign Up"}
           </Button>
         </div>
       </form>

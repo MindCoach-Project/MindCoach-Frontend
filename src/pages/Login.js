@@ -93,7 +93,7 @@ function Login() {
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Signing..." : "Sign In"}
+            {isLoading ? "Signing" : "Sign In"}
           </Button>
         </div>
       </form>
