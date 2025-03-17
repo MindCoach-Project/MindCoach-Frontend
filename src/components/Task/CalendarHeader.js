@@ -20,7 +20,7 @@ function CalendarHeader({ date, view, onDateChange, onViewChange }) {
     <div className="fixed w-full flex flex-row justify-between items-center z-20">
       {/* Section 1 */}
       <div className="flex items-center">
-        <h2 className="text-18 font-semibold text-brown">
+        <h2 className="text-16 font-regular text-brown">
           {format(date, view === "day" ? "EEEE, dd MMMM" : "MMMM yyyy")}
         </h2>
       </div>

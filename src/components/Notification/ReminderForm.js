@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogClose,
 } from "../ui";
-import { Button } from "../ui";
 import { formatVietnamDate } from "../../utils/TimezoneUtils";
 const formatTime = (dateString) => {
   if (!dateString) return "";
@@ -43,20 +42,17 @@ export function ReminderForm({
   onClose, 
   taskDetails 
 }) {
-  const [timeRemaining, setTimeRemaining] = useState(30); // 30 second countdown
+  const [timeRemaining, setTimeRemaining] = useState(30); 
   
-  // Determine which case we're handling
   const hasSubtasks = taskDetails?.subtaskMessages?.length > 0;
   const showSubtasksOnly = hasSubtasks && taskDetails.subtaskMessages.some(
     subtask => new Date(subtask.startTime) < new Date(taskDetails.startTime)
   );
   
-  // For TH1: Check if all times match
   const allTimesMatch = hasSubtasks && taskDetails.subtaskMessages.every(
     subtask => timesMatch(subtask.startTime, taskDetails.startTime)
   );
   
-  // Find the earliest task to display first
   const getOrderedTasks = () => {
     if (!hasSubtasks) return [];
     
@@ -69,10 +65,8 @@ export function ReminderForm({
 
   useEffect(() => {
     if (isOpen) {
-      // Reset timer when dialog opens
       setTimeRemaining(30);
       
-      // Start countdown
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
@@ -84,25 +78,20 @@ export function ReminderForm({
         });
       }, 1000);
 
-      // Cleanup function
       return () => {
         clearInterval(timer);
       };
     }
   }, [isOpen, onClose]);
   
-  // If taskDetails is undefined or null, render nothing
   if (!taskDetails) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-green-50 to-blue-50 border-green-200">
+      <DialogContent className="sm:max-w-[425px] bg-inherit">
         <DialogHeader>
           <DialogTitle className="text-center text-green-700 relative">
             {showSubtasksOnly ? "Upcoming Subtask" : "Reminder"}
-            <div className="absolute right-0 top-0 text-sm text-gray-500">
-              {timeRemaining}s
-            </div>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100">
               <X className="h-4 w-4" />
             </DialogClose>
@@ -110,7 +99,6 @@ export function ReminderForm({
         </DialogHeader>
 
         <div className="py-4">
-          {/* Main reminder icon */}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
               <Clock className="h-10 w-10 text-green-600" />
@@ -121,11 +109,11 @@ export function ReminderForm({
           {allTimesMatch && (
             <div className="space-y-4">
               {/* Main task */}
-              <div className="bg-white p-3 rounded-lg shadow-sm border border-green-100">
+              <div className="bg-white p-3 rounded-lg border border-green-100">
                 <h3 className="font-medium text-green-800">{taskDetails.title}</h3>
                 <div className="flex items-center text-sm text-gray-600 mt-1">
                   <Clock className="h-4 w-4 mr-1" />
-                  <span>{formatTime(taskDetails.startTime)}</span>
+                  <span>Start at {formatTime(taskDetails.startTime)}</span>
                 </div>
               </div>
 
@@ -135,11 +123,11 @@ export function ReminderForm({
                   <ArrowDown className="h-5 w-5 text-green-600" />
                 </div>
                 {taskDetails.subtaskMessages.map((subtask, index) => (
-                  <div key={index} className="bg-white p-3 rounded-lg shadow-sm border border-green-100 ml-4">
+                  <div key={index} className="bg-white p-3 rounded-lg border border-green-100 ml-4">
                     <h4 className="font-medium text-green-700">{subtask.title}</h4>
                     <div className="flex items-center text-sm text-gray-600 mt-1">
                       <Clock className="h-4 w-4 mr-1" />
-                      <span>{formatTime(subtask.startTime)}</span>
+                      <span>Start at {formatTime(subtask.startTime)}</span>
                     </div>
                   </div>
                 ))}
@@ -149,11 +137,11 @@ export function ReminderForm({
 
           {/* Case TH2: Show only task when no subtasks */}
           {!hasSubtasks && (
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100">
+            <div className="bg-white p-4 rounded-lg border border-green-100">
               <h3 className="font-medium text-green-800 text-center">{taskDetails.title}</h3>
               <div className="flex items-center justify-center text-sm text-gray-600 mt-2">
                 <Clock className="h-4 w-4 mr-1" />
-                <span>{formatTime(taskDetails.startTime)}</span>
+                <span>Start at {formatTime(taskDetails.startTime)}</span>
               </div>
             </div>
           )}
@@ -164,11 +152,11 @@ export function ReminderForm({
               {orderedSubtasks.filter(subtask => 
                 new Date(subtask.startTime) < new Date(taskDetails.startTime)
               ).map((subtask, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-green-100">
+                <div key={index} className="bg-white p-4 rounded-lg border border-green-100">
                   <h3 className="font-medium text-green-700">{subtask.title}</h3>
                   <div className="flex items-center text-sm text-gray-600 mt-2">
                     <Clock className="h-4 w-4 mr-1" />
-                    <span>{formatTime(subtask.startTime)}</span>
+                    <span>Start at {formatTime(subtask.startTime)}</span>
                   </div>
                 </div>
               ))}
@@ -178,21 +166,21 @@ export function ReminderForm({
           {/* Case with subtasks but not falling into TH1 or TH3 */}
           {hasSubtasks && !allTimesMatch && !showSubtasksOnly && (
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100">
+              <div className="bg-white p-4 rounded-lg border border-green-100">
                 <h3 className="font-medium text-green-800">{taskDetails.title}</h3>
                 <div className="flex items-center text-sm text-gray-600 mt-1">
                   <Clock className="h-4 w-4 mr-1" />
-                  <span>{formatTime(taskDetails.startTime)}</span>
+                  <span>Start at {formatTime(taskDetails.startTime)}</span>
                 </div>
               </div>
               
               <div className="space-y-2">
                 {orderedSubtasks.map((subtask, index) => (
-                  <div key={index} className="bg-white p-3 rounded-lg shadow-sm border border-green-100 ml-4">
+                  <div key={index} className="bg-white p-3 rounded-lg border border-green-100 ml-4">
                     <h4 className="font-medium text-green-700">{subtask.title}</h4>
                     <div className="flex items-center text-sm text-gray-600 mt-1">
                       <Clock className="h-4 w-4 mr-1" />
-                      <span>{formatTime(subtask.startTime)}</span>
+                      <span>Start at {formatTime(subtask.startTime)}</span>
                     </div>
                   </div>
                 ))}
@@ -202,12 +190,7 @@ export function ReminderForm({
         </div>
 
         <div className="flex justify-center mt-2">
-          <Button
-            onClick={onClose}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            Dismiss
-          </Button>
+              {timeRemaining}s
         </div>
       </DialogContent>
     </Dialog>

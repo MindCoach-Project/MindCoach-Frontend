@@ -180,16 +180,16 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
             >
               <div
                 className={cn(
-                  "text-sm font-medium",
-                  isToday(day) && "text-primary"
+                  "text-sm font-medium text-brown",
+                  isToday(day) && "text-orange"
                 )}
               >
                 {format(day, "EEE")}
               </div>
               <div
                 className={cn(
-                  "text-sm text-muted-foreground",
-                  isToday(day) && "text-primary"
+                  "text-sm text-brown",
+                  isToday(day) && "text-orange"
                 )}
               >
                 {format(day, "d")}

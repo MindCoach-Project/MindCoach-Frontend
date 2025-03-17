@@ -9,7 +9,7 @@ const SportTemplate = () => {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const templatesData = await getTemplates("work");
+        const templatesData = await getTemplates("sport");
 
         const formattedTemplates = templatesData.map((item) => ({
           id: item.id,

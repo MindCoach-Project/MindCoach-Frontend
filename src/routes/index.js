@@ -1,14 +1,5 @@
-import {
-  Home,
-  Intro,
-  ListTasks,
-  Profile,
-  TaskStatusPage,
-  WorkTemplate,
-  HouseholdTemplate,
-  SportTemplate,
-  RelaxTemplate,
-} from "../pages";
+import { Home, Intro, ListTasks, Profile, TaskStatusPage, WorkTemplate, HouseholdTemplate, SportTemplate, RelaxTemplate, Reminder } from "../pages";
+import { BlogDetail } from "../components";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
 import { LoginLayout, DefaultLayout } from "../layouts";
@@ -98,6 +89,18 @@ let privateRoutes = [
   {
     path: site_path.TEMPLATE_RELAX,
     component: RelaxTemplate,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  },
+  {
+    path: site_path.REMINDER,
+    component: Reminder,
+    layout: DefaultLayout,
+    error: AthUtils.handleAuthorization,
+  }, 
+  {
+    path: site_path.BLOG_DETAIL, 
+    component: BlogDetail,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
   },

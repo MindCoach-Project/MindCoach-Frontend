@@ -16,6 +16,7 @@ function Register() {
   });
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +37,8 @@ function Register() {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       await registerUser(formData);
       setToast({ type: "success", message: "Register successful!" });
@@ -51,6 +54,8 @@ function Register() {
           message: error.title || "Registration failed.",
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,9 +104,14 @@ function Register() {
           onChange={handleChange}
           error={errors.confirmPassword}
         />
-        <div className="flex justify-center">
-          <Button className="w-1/2" size="lg" type="submit">
-            Sign Up
+        <div className="flex justify-center mt-12">
+          <Button
+            className="w-1/2"
+            size="lg"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing Up" : "Sign Up"}
           </Button>
         </div>
       </form>

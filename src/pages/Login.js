@@ -14,6 +14,7 @@ function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +41,8 @@ function Login() {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const { data } = await loginUser(formData);
       setToast({ type: "success", message: "Login successful!" });
@@ -54,6 +57,8 @@ function Login() {
     } catch (error) {
       const errorMessage = "Invalid email or password.";
       setErrors({ email: errorMessage, password: errorMessage });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,10 +87,14 @@ function Login() {
           onChange={handleChange}
           error={errors.password}
         />
-        <p className="text-left text-16 text-brown">Forgot password?</p>
-        <div className="flex justify-center">
-          <Button className="w-1/2" size="lg" type="submit">
-            Sign In
+        <div className="flex justify-center mt-12">
+          <Button
+            className="w-1/2"
+            size="lg"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing" : "Sign In"}
           </Button>
         </div>
       </form>

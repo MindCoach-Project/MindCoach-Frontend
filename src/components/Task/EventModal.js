@@ -224,6 +224,12 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
       if (defaultValues?.id) {
         await updateTask(defaultValues.id, eventData)
         toast.success("Task updated successfully")
+
+        // Force the parent component to refresh with the updated data
+        // This ensures the UI reflects the new status
+        if (typeof onSubmit === "function") {
+          onSubmit({ ...defaultValues, status: status })
+        }
       } else {
         await createTask(eventData)
         toast.success("Task created successfully")
@@ -342,7 +348,7 @@ export function EventModal({ isOpen, onClose, onSubmit, defaultValues, selectedT
                       className="w-full px-3 py-2 my-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-500"
                     >
                       <option value="todo">To Do</option>
-                      <option value="in-progress">In Progress</option>
+                      <option value="inprogress">In Progress</option>
                       <option value="done">Done</option>
                     </select>
                   </div>
