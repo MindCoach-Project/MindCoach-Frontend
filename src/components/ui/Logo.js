@@ -1,3 +1,3 @@
 export default function Logo({ width = 240 }) { 
-    return <img src="../../assets/images/logo.png" alt="logo" width={width} />;
+    return <img src="/assets/images/mindcoach_logo.png" alt="logo" width={width} />;
 }
