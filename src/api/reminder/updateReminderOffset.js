@@ -2,11 +2,11 @@ import api from "../../utils/ApiUtils";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-export const updateReminderOffset = async (reminderOffsetData) => {
+export const updateReminderOffset = async (reminderOffsetMinutes) => {
   try {
     const response = await api.put(
-      `${apiUrl}/users/update-reminder-offset`, 
-      reminderOffsetData
+      `${apiUrl}/task-management/tasks/update-reminder-offset`, 
+      reminderOffsetMinutes
     );
     
     return response.data.data;

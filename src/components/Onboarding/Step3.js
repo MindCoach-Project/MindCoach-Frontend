@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OnBoard2 = () => {
+const OnBoard3 = () => {
   const navigate = useNavigate();
 
   // Danh sách các vấn đề có thể chọn
@@ -83,4 +83,4 @@ const OnBoard2 = () => {
   );
 };
 
-export default OnBoard2;
+export default OnBoard3;
