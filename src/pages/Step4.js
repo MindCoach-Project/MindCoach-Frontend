@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import OnboardingLayout from "../../layouts/Onboarding"
-import SelectionOption from "./SelectOption"
+import { useState } from "react";
+import OnboardingLayout from "../components/Onboarding/Onboarding";
+import SelectionOption from "../components/Onboarding/SelectOption";
 
 export default function OnBoard4() {
   const tasks = [
@@ -10,15 +10,17 @@ export default function OnBoard4() {
     { name: "Household", icon: "🏡" },
     { name: "Sport", icon: "⚽" },
     { name: "Relax", icon: "😌" },
-  ]
+  ];
 
-  const [selectedTasks, setSelectedTasks] = useState([])
+  const [selectedTasks, setSelectedTasks] = useState([]);
 
   const toggleTask = (taskName) => {
     setSelectedTasks((prev) =>
-      prev.includes(taskName) ? prev.filter((task) => task !== taskName) : [...prev, taskName],
-    )
-  }
+      prev.includes(taskName)
+        ? prev.filter((task) => task !== taskName)
+        : [...prev, taskName]
+    );
+  };
 
   return (
     <OnboardingLayout
@@ -41,6 +43,5 @@ export default function OnBoard4() {
         ))}
       </div>
     </OnboardingLayout>
-  )
+  );
 }
-

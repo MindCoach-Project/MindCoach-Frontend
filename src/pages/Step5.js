@@ -1,7 +1,7 @@
 "use client";
-import OnboardingLayout from "../../layouts/Onboarding";
+import OnboardingLayout from "../components/Onboarding/Onboarding";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../ui";
+import { Button } from "../components/ui";
 import { ArrowRight } from "lucide-react";
 export default function OnBoard5() {
   const navigate = useNavigate();

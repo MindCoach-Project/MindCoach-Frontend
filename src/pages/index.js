@@ -10,3 +10,8 @@ export { default as HouseholdTemplate } from "./HouseholdTemplate";
 export { default as SportTemplate } from "./SportTemplate";
 export { default as RelaxTemplate } from "./RelaxTemplate";
 export { default as Reminder } from "./Reminder";
+export { default as OnBoard1 } from "./Step1";
+ export { default as OnBoard2 } from "./Step2";
+ export { default as OnBoard3 } from "./Step3";
+ export { default as OnBoard4 } from "./Step4";
+ export { default as OnBoard5 } from "./Step5";

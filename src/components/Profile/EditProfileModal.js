@@ -65,20 +65,16 @@ const EditProfileModal = ({
               }
             />
           </div>
-          <div>
-            <Label>Email</Label>
-            <Input type="email" name="email" value={formData.email} disabled />
-          </div>
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-row items-end justify-end gap-2 pt-2">
             <Button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 w-1/2 text-gray-800 hover:bg-gray-400"
+              className="bg-gray-300 text-gray-800 hover:bg-gray-400"
             >
               Cancel
             </Button>
-            <Button type="submit" className="w-1/2">
-              Save Changes
+            <Button type="submit">
+              Update
             </Button>
           </div>
         </form>
