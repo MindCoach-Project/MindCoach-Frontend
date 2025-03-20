@@ -33,10 +33,10 @@ const TaskStatusChart = ({ data }) => {
               <Bar
                 dataKey="In Progress"
                 stackId="a"
-                fill="#C893FD"
+                fill="#F4A3EA"
                 barSize={24}
               />
-              <Bar dataKey="To Do" stackId="a" fill="#E0C6FD" barSize={24} />
+              <Bar dataKey="To Do" stackId="a" fill="#949494" barSize={24} />
             </BarChart>
           </ResponsiveContainer>
         </div>

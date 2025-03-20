@@ -22,7 +22,7 @@ const ProfilePage = () => {
     return storedUser ? JSON.parse(storedUser) : {
       username: "Tran",
       email: "name@example.com",
-      dateOfBirth: "20/04/2000",
+      dateOfBirth: "",
       imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
     };
   };
@@ -80,7 +80,7 @@ const ProfilePage = () => {
   const handleLogoutClick = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    dispatch(actions.setUser(null)); // Xóa user trong state
+    dispatch(actions.setUser(null)); 
     setTimeout(() => navigate(site_path.INTRO), 1000);
   };
 
@@ -148,7 +148,7 @@ const ProfilePage = () => {
             <p className="text-gray-600">
               {profileData.dateOfBirth
                 ? new Date(profileData.dateOfBirth).toLocaleDateString()
-                : "N/A"}
+                : "20/12/20xx"}
             </p>
             <p className="text-gray-600">{profileData.email}</p>
             <div className="flex gap-2">
@@ -170,7 +170,9 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+
       <TaskStatusChart data={taskData} />
+      
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}

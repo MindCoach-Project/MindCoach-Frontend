@@ -1,13 +1,25 @@
-import { Home, Intro, ListTasks, Profile, TaskStatusPage, WorkTemplate, HouseholdTemplate, SportTemplate, RelaxTemplate, Reminder } from "../pages";
+import {
+  Home,
+  Intro,
+  ListTasks,
+  Profile,
+  TaskStatusPage,
+  WorkTemplate,
+  HouseholdTemplate,
+  SportTemplate,
+  RelaxTemplate,
+  Reminder,
+  OnBoard1,
+  OnBoard2,
+  OnBoard3,
+  OnBoard4,
+  OnBoard5,
+} from "../pages";
 import { BlogDetail } from "../components";
 import { AthUtils } from "../utils";
 import { site_path } from "../utils";
-import { LoginLayout, DefaultLayout } from "../layouts";
-import OnBoard1 from "../components/Onboarding/Step1";
-import OnBoard2 from "../components/Onboarding/Step2";
-import OnBoard3 from "../components/Onboarding/Step3";
-import OnBoard4 from "../components/Onboarding/Step4";
-import OnBoard5 from "../components/Onboarding/Step5";
+import { LoginLayout, DefaultLayout, OnboardingLayout } from "../layouts";
+
 
 const files = require.context(".", false, /\.js$/);
 
@@ -20,27 +32,27 @@ let publicRoutes = [
   {
     path: site_path.ONBOARD1,
     component: OnBoard1,
-    layout: LoginLayout,
+    layout: OnboardingLayout,
   },
   {
     path: site_path.ONBOARD2,
     component: OnBoard2,
-    layout: LoginLayout,
+    layout: OnboardingLayout,
   },
   {
     path: site_path.ONBOARD3,
     component: OnBoard3,
-    layout: LoginLayout,
+    layout: OnboardingLayout,
   },
   {
     path: site_path.ONBOARD4,
     component: OnBoard4,
-    layout: LoginLayout,
+    layout: OnboardingLayout,
   },
   {
     path: site_path.ONBOARD5,
     component: OnBoard5,
-    layout: LoginLayout,
+    layout: OnboardingLayout,
   },
 ];
 let privateRoutes = [
@@ -97,9 +109,9 @@ let privateRoutes = [
     component: Reminder,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
-  }, 
+  },
   {
-    path: site_path.BLOG_DETAIL, 
+    path: site_path.BLOG_DETAIL,
     component: BlogDetail,
     layout: DefaultLayout,
     error: AthUtils.handleAuthorization,
