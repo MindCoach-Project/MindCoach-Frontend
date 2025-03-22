@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import { FaUser } from "react-icons/fa"
 import { useGlobalState } from "../global/state"
 import { useEffect, useState } from "react"
+import { ensureHttps } from "../utils/ensureHttps"
 
 function Header() {
   const { state } = useGlobalState()
@@ -16,16 +17,14 @@ function Header() {
   }
 
   useEffect(() => {
-    // Check if user exists in global state
     if (state.user && isValidImageUrl(state.user.imageUrl)) {
-      setProfileImage(state.user.imageUrl)
+      setProfileImage(ensureHttps(state.user.imageUrl))
     } else {
-      // Fallback to localStorage if global state doesn't have user data
       const storedUser = localStorage.getItem("user")
       if (storedUser) {
         const userData = JSON.parse(storedUser)
         if (userData && isValidImageUrl(userData.imageUrl)) {
-          setProfileImage(userData.imageUrl)
+          setProfileImage(ensureHttps(userData.imageUrl))
         } else {
           setProfileImage(defaultImage)
         }
@@ -33,7 +32,7 @@ function Header() {
         setProfileImage(defaultImage)
       }
     }
-  }, [state.user]) // Re-run when state.user changes
+  }, [state.user])
 
   return (
     <div className="flex justify-between z-50 mt-12">

@@ -1,112 +1,139 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Edit, Camera, LogOut } from "lucide-react";
-import EditProfileModal from "../components/Profile/EditProfileModal";
-import TaskStatusChart from "../components/Profile/TaskStatusChart";
-import { Button } from "../components/ui/Button";
-import { useNavigate } from "react-router-dom";
-import { site_path } from "../utils";
-import { getTrackingWeek } from "../api/task";
-import { Loading } from "../components/ui";
-import { useGlobalState } from "../global/state";
-import { actions } from "../global/state";
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { Edit, Camera, LogOut } from "lucide-react"
+import EditProfileModal from "../components/Profile/EditProfileModal"
+import TaskStatusChart from "../components/Profile/TaskStatusChart"
+import { Button } from "../components/ui/Button"
+import { useNavigate } from "react-router-dom"
+import { site_path } from "../utils"
+import { getTrackingWeek } from "../api/task"
+import { Loading } from "../components/ui"
+import { useGlobalState } from "../global/state"
+import { actions } from "../global/state"
 
 const ProfilePage = () => {
-  const fileInputRef = useRef(null);
-  const navigate = useNavigate();
-  const { state, dispatch } = useGlobalState();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  
+  const fileInputRef = useRef(null)
+  const navigate = useNavigate()
+  const { state, dispatch } = useGlobalState()
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+
   const getStoredProfile = () => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : {
-      username: "Tran",
-      email: "name@example.com",
-      dateOfBirth: "",
-      imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
-    };
-  };
+    const storedUser = localStorage.getItem("user")
+    return storedUser
+      ? JSON.parse(storedUser)
+      : {
+          username: "Tran",
+          email: "name@example.com",
+          dateOfBirth: "",
+          imageUrl: "https://cdn-icons-png.flaticon.com/512/8792/8792047.png",
+        }
+  }
 
-  const [profileData, setProfileData] = useState(getStoredProfile);
+  const [profileData, setProfileData] = useState(getStoredProfile)
 
-  const [taskData, setTaskData] = useState([]);
-  const [formData, setFormData] = useState({ ...profileData });
+  const [taskData, setTaskData] = useState([])
+  const [formData, setFormData] = useState({ ...profileData })
+
+  const ensureHttps = (url) => {
+    if (url && url.startsWith("http://")) {
+      return url.replace("http://", "https://")
+    }
+    return url
+  }
 
   const handleEditClick = () => {
-    setFormData({ ...profileData });
-    setIsEditModalOpen(true);
-  };
+    setFormData({ ...profileData })
+    setIsEditModalOpen(true)
+  }
 
   const handleFormSubmit = (updatedData) => {
-    setProfileData(updatedData);
-    localStorage.setItem("user", JSON.stringify(updatedData));
-    dispatch(actions.setUser(updatedData)); 
-    setIsEditModalOpen(false);
-  };
+    const secureData = {
+      ...updatedData,
+      imageUrl: ensureHttps(updatedData.imageUrl),
+    }
+
+    setProfileData(secureData)
+    localStorage.setItem("user", JSON.stringify(secureData))
+    dispatch(actions.setUser(secureData))
+    setIsEditModalOpen(false)
+  }
 
   const handleCloseModal = () => {
-    setIsEditModalOpen(false);
-  };
+    setIsEditModalOpen(false)
+  }
 
   const handleImageChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const file = event.target.files[0]
+    if (!file) return
 
-    setIsUploading(true);
+    setIsUploading(true)
 
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "first_time_cloudiary");
-    data.append("cloud_name", "dzxszhmvr");
+    const data = new FormData()
+    data.append("file", file)
+    data.append("upload_preset", "first_time_cloudiary")
+    data.append("cloud_name", "dzxszhmvr")
 
     try {
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload",
-        { method: "POST", body: data }
-      );
-      const uploadedUrlImage = await res.json();
+      const res = await fetch("https://api.cloudinary.com/v1_1/dzxszhmvr/image/upload", { method: "POST", body: data })
+      const uploadedUrlImage = await res.json()
 
-      const updatedProfile = { ...profileData, imageUrl: uploadedUrlImage.url };
-      setProfileData(updatedProfile);
-      localStorage.setItem("user", JSON.stringify(updatedProfile));
-      dispatch(actions.setUser(updatedProfile)); // Dispatch cập nhật ảnh
+      const secureUrl = ensureHttps(uploadedUrlImage.url)
+
+      console.log(secureUrl);
+
+      const updatedProfile = { ...profileData, imageUrl: secureUrl }
+      setProfileData(updatedProfile)
+      localStorage.setItem("user", JSON.stringify(updatedProfile))
+      dispatch(actions.setUser(updatedProfile))
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("Upload failed:", error)
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const handleLogoutClick = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    dispatch(actions.setUser(null)); 
-    setTimeout(() => navigate(site_path.INTRO), 1000);
-  };
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    dispatch(actions.setUser(null))
+    setTimeout(() => navigate(site_path.INTRO), 1000)
+  }
 
   useEffect(() => {
+    if (profileData.imageUrl && profileData.imageUrl.startsWith("http://")) {
+      const secureProfile = {
+        ...profileData,
+        imageUrl: ensureHttps(profileData.imageUrl),
+      }
+      setProfileData(secureProfile)
+      localStorage.setItem("user", JSON.stringify(secureProfile))
+      dispatch(actions.setUser(secureProfile))
+    }
+
     const fetchData = async () => {
       try {
-        const apiData = await getTrackingWeek();
-        const fullWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const apiData = await getTrackingWeek()
+        const fullWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         const formattedData = fullWeek.map((day) => {
-          const found = apiData.find((item) => item.date === day);
+          const found = apiData.find((item) => item.date === day)
           return {
             day,
             "To Do": found ? found.toDo : 0,
             "In Progress": found ? found.inProgress : 0,
             Done: found ? found.done : 0,
-          };
-        });
+          }
+        })
 
-        setTaskData(formattedData);
+        setTaskData(formattedData)
       } catch (error) {
-        console.error("Error fetching task tracking data:", error);
+        console.error("Error fetching task tracking data:", error)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   return (
     <div className="relative">
@@ -119,20 +146,14 @@ const ProfilePage = () => {
               </div>
             ) : (
               <img
-                src={profileData.imageUrl}
+                src={profileData.imageUrl || "/placeholder.svg"}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
             )}
           </div>
 
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            className="hidden"
-          />
+          <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
 
           <button
             onClick={() => fileInputRef.current.click()}
@@ -146,16 +167,11 @@ const ProfilePage = () => {
           <div className="space-y-2">
             <h2 className="text-xl font-medium">{profileData.username}</h2>
             <p className="text-gray-600">
-              {profileData.dateOfBirth
-                ? new Date(profileData.dateOfBirth).toLocaleDateString()
-                : "20/12/20xx"}
+              {profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toLocaleDateString() : "20/12/20xx"}
             </p>
             <p className="text-gray-600">{profileData.email}</p>
             <div className="flex gap-2">
-              <Button
-                onClick={handleEditClick}
-                className="mt-4 flex items-center gap-1"
-              >
+              <Button onClick={handleEditClick} className="mt-4 flex items-center gap-1">
                 <Edit size={16} />
                 Update
               </Button>
@@ -172,7 +188,7 @@ const ProfilePage = () => {
       </div>
 
       <TaskStatusChart data={taskData} />
-      
+
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
@@ -181,7 +197,8 @@ const ProfilePage = () => {
         onSubmit={handleFormSubmit}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage
+
