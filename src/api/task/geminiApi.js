@@ -1,5 +1,5 @@
 
-const gemini = process.env.REACT_APP_API_BASE_URL;
+const gemini = process.env.REACT_APP_GEMINI_URL;
 
 export const callGeminiAPI = async (text) => {
     try {
