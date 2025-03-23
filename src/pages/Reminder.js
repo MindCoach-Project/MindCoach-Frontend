@@ -33,7 +33,7 @@ export default function ReminderPage() {
 
     try {
       const result = await updateReminderOffset({
-        reminderOffset: selectedOffset,
+        reminderOffsetMinutes: selectedOffset,
       });
 
       setCurrentOffset(result.reminderOffset);

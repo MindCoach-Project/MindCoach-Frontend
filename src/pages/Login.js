@@ -63,7 +63,7 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center gap-6">
+    <div className="flex flex-col items-center justify-center text-center gap-6 mt-12">
       <Logo width={220} />
       <PageTitle title="Sign In" />
       <form className="w-full flex flex-col gap-6" onSubmit={handleLogin}>
