@@ -36,8 +36,8 @@ export default function ReminderPage() {
         reminderOffsetMinutes: selectedOffset,
       });
 
-      setCurrentOffset(result.reminderOffset);
-      localStorage.setItem("reminderOffset", result.reminderOffset);
+      setCurrentOffset(result.reminderOffsetMinutes);
+      localStorage.setItem("reminderOffset", result.reminderOffsetMinutes);
 
       setToast({ type: "success", message: "Updated successfully" });
 
