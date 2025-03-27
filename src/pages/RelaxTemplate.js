@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TemplateLayout } from "../layouts";
 import { TaskList } from "../components/Template";
 import { getTemplates } from "../api/template";
-
+import { formatVietnamDate } from "../utils/TimezoneUtils";
 const RelaxTemplate = () => {
   const [templates, setTemplates] = useState([]);
 
@@ -12,10 +12,16 @@ const RelaxTemplate = () => {
         const templatesData = await getTemplates("relax");
 
         const formattedTemplates = templatesData.map((item) => ({
-          id: item.id,
-          title: item.name,
-          tasks: item.unifiedTasks || [],
-        }));
+                  id: item.id,
+                  title: item.name,
+                  tasks: item.unifiedTasks
+                    ? item.unifiedTasks.map((task) => ({
+                        ...task,
+                        startTime: formatVietnamDate(task.startTime), 
+                        endTime: formatVietnamDate(task.endTime), 
+                      }))
+                    : [],
+                }));
         setTemplates(formattedTemplates);
       } catch (error) {
         console.error("Error fetching templates:", error);

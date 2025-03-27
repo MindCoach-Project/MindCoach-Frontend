@@ -27,16 +27,16 @@ export default function CalendarPage() {
       setIsLoading(true);
       const tasks =
         view === "day" ? await getTasksByDay(date) : await getTasksByWeek(date);
-
       const transformedEvents = tasks.map((task) => ({
         id: task.id,
         title: task.title,
         description: task.description,
-        priority: task.priority.toLowerCase(),
+        priority: task.priority?.toLowerCase(),
         status: task.status.toLowerCase(),
         start: formatVietnamDate(task.startTime),
         end: formatVietnamDate(task.endTime),
         type: task.type,
+        taskId: task.type === "SubTask" ? task.taskId : null,
         subtasks:
           task.subTasks?.map((st) => ({
             id: st.id,
@@ -45,9 +45,10 @@ export default function CalendarPage() {
             status: st.status.toLowerCase(),
             startTime: formatVietnamDate(st.startTime),
             endTime: formatVietnamDate(st.endTime),
+            taskId: task?.id,
           })) || [],
       }));
-
+      console.log(tasks);
       setEvents(transformedEvents);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -59,9 +60,9 @@ export default function CalendarPage() {
   const handleEventClick = async (event) => {
     try {
       setIsLoading(true);
-
+      console.log("event", event);
       const taskDetails = await getTaskDetail(
-        event.type === "SubTask" && event.parentId ? event.parentId : event.id
+        event.type === "SubTask" && event.taskId ? event.taskId : event.id
       );
       const transformedTask = {
         id: taskDetails.id,
@@ -71,6 +72,7 @@ export default function CalendarPage() {
         status: taskDetails.status.toLowerCase(),
         start: formatVietnamDate(taskDetails.startTime),
         end: formatVietnamDate(taskDetails.endTime),
+        taskId: taskDetails?.taskId,
         subtasks:
           taskDetails.subTasks?.map((st) => ({
             id: st.id,

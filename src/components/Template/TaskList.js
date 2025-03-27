@@ -26,7 +26,7 @@ export function TaskList({ tasks }) {
 
       setTimeout(() => {
         setToast(null);
-        navigate(site_path.TASKS);
+        navigate("/tasks");
       }, 2000);
     } catch (error) {
       setToast({ type: "error", message: "Sync failed." });

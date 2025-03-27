@@ -26,7 +26,7 @@ export const toISOStringUTC = (localDate) => {
 export const formatDate = (isoString) => {
   if (!isoString) return "Không xác định";
   const date = new Date(isoString);
-  return date.toLocaleString("vi-VN", {
+  return date.toLocaleString("en-US", {
     timeZone: "Asia/Ho_Chi_Minh",
     weekday: "long",
     day: "2-digit",

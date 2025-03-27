@@ -12,11 +12,13 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
 
   const handleEventClick = (event) => {
     if (event.type === "SubTask") {
+      console.log(event);
       onEventClick({
-        id: event.parentId,
-        selectedSubtaskId: event.id,
+        taskId: event.taskId,
+        type: event.type,
+        id: event.id,
         subtasks: processedEvents.filter(
-          (e) => e.parentId === event.parentId && e.type === "SubTask"
+          (e) => e.taskId === event.parentId && e.type === "SubTask"
         ),
       });
     } else {
@@ -41,32 +43,46 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
       start: new Date(subtask.startTime),
       end: new Date(subtask.endTime),
       type: "SubTask",
-      parentId: event.id,
+      taskId: event.id,
       parentTitle: event.title,
     }));
 
     return [mainEvent, ...subtaskEvents];
   });
 
+  // const getEventPosition = (event) => {
+  //   const startHour = new Date(event.start).getHours();
+  //   const startMinute = new Date(event.start).getMinutes();
+  //   const endHour = new Date(event.end).getHours();
+  //   const endMinute = new Date(event.end).getMinutes();
+
+  //   const top = startHour * 60 + startMinute;
+  //   const height = endHour * 60 + endMinute - top;
+
+  //   return {
+  //     top: `${top}px`,
+  //     height: `${height}px`,
+  //   };
+  // };
   const getEventPosition = (event) => {
     const startHour = new Date(event.start).getHours();
     const startMinute = new Date(event.start).getMinutes();
     const endHour = new Date(event.end).getHours();
     const endMinute = new Date(event.end).getMinutes();
 
-    const top = startHour * 60 + startMinute;
-    const height = endHour * 60 + endMinute - top;
+    const top = Math.max(0, (startHour * 60 + startMinute) * (60 / 60)); // Không để top < 0
+    const height = Math.max(
+      20,
+      (endHour * 60 + endMinute - (startHour * 60 + startMinute)) * (60 / 60)
+    );
 
-    return {
-      top: `${top}px`,
-      height: `${height}px`,
-    };
+    return { top: `${top}px`, height: `${height}px` };
   };
 
   const renderEvent = (event, dayIndex = null, isWeekView = false) => {
-    const { top, height } = getEventPosition(event);
-    console.log(event, dayIndex, isWeekView);
+    console.log(`render event ${event}`);
 
+    const { top, height } = getEventPosition(event);
     const style =
       dayIndex !== null
         ? {
@@ -89,7 +105,6 @@ export function TimeGrid({ date, view, events, onTimeClick, onEventClick }) {
       done: "bg-green-200 text-green-700 border-green-300",
     };
 
-    // Different styling for week view vs day view
     const baseClasses = cn(
       "absolute rounded-lg border p-2 cursor-pointer transition-colors",
       event.type === "SubTask"

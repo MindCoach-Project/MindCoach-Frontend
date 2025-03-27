@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TemplateLayout } from "../layouts";
 import { TaskList } from "../components/Template";
 import { getTemplates } from "../api/template";
-
+import { formatVietnamDate } from "../utils/TimezoneUtils";
 const HouseholdTemplate = () => {
   const [templates, setTemplates] = useState([]);
 
@@ -10,11 +10,18 @@ const HouseholdTemplate = () => {
     const fetchTemplates = async () => {
       try {
         const templatesData = await getTemplates("household");
+        console.log("template data", templatesData);
 
         const formattedTemplates = templatesData.map((item) => ({
           id: item.id,
           title: item.name,
-          tasks: item.unifiedTasks || [],
+          tasks: item.unifiedTasks
+            ? item.unifiedTasks.map((task) => ({
+                ...task,
+                startTime: formatVietnamDate(task.startTime), 
+                endTime: formatVietnamDate(task.endTime), 
+              }))
+            : [],
         }));
         setTemplates(formattedTemplates);
       } catch (error) {
