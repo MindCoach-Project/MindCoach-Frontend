@@ -1,10 +1,9 @@
-import { Fragment } from "react";
 
 function Login({ children }) {
    return (
-      <Fragment>
-            <div className="container">{children}</div>
-      </Fragment>
+      <div className="container">
+            <div>{children}</div>
+      </div>
    );
 }
 

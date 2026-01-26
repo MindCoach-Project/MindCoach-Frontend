@@ -1,128 +1,112 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-
-import { useGlobalState } from '../global/state';
-import { actions } from '../global/state';
-import { site_path } from "../utils"
+import { useState, useEffect } from "react";
+import { useGlobalState } from "../global/state";
+import { actions } from "../global/state";
+import { site_path } from "../utils";
+import { validateLoginForm } from "../utils";
+import { Logo, PageTitle, Input, Button } from "../components/ui";
+import { Link, useNavigate } from "react-router-dom";
+import ToastMessage from "../components/ui/ToastMessage";
+import { loginUser } from "../api/auth/login";
 
 function Login() {
-   const [state, dispatch] = useGlobalState();
+  const { state, dispatch } = useGlobalState();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-   const navigate = useNavigate();
-   const [formData, setFormData] = useState({
-      username: '',
-      password: '',
-   });
-   const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({ ...prevData, [name]: value }));
-   };
-   async function handleLogin(e, username, password){
-      e.preventDefault();
-      if(username === "admin" && password === "admin"){
-         localStorage.setItem('token', "ok");
-         dispatch(actions.setIsLogin(true));
-         toast.success("Login is successfully");
-         navigate(site_path.HOME);
-      }else{
-         toast.error("There are wrong this here, please typing username and password again");
-      }
-   }
-   return (
-      <div className="full-page-container">
-         <div className="card shadow border-0 my-4">
-            <div className="card-header bg-secondary bg-gradient ml-0 py-4">
-               <div className="row">
-                  <div className="col-12 text-center">
-                     <h1 className="py-2 text-white">Log in</h1>
-                  </div>
-               </div>
-            </div>
-            <div className="card-body p-4">
-               <div className="row pt-3">
-                  <div className="col-md-12">
-                     <section>
-                        <form id="account" method="post">
-                           <h2 className="border-bottom pb-3 mb-4 text-secondary text-center">
-                              Use a local account to log in.
-                           </h2>
-                           <div asp-validation-summary="ModelOnly" className="text-danger" role="alert"></div>
-                           <div className="form-floating mb-3">
-                              <input
-                                 htmlFor="Username"
-                                 value={formData.username}
-                                 onChange={handleChange}
-                                 className="form-control"
-                                 placeholder="name@example.com"
-                                 name="username"
-                                 autoComplete="username" 
-                              />
-                              <label htmlFor="Username" className="form-label">
-                                 Username
-                              </label>
-                           </div>
-                           <div className="form-floating mb-3">
-                              <input
-                                 htmlFor="Password"
-                                 value={formData.password}
-                                 onChange={handleChange}
-                                 className="form-control"
-                                 placeholder="password"
-                                 type="password"
-                                 name="password"
-                                 autoComplete="current-password" 
-                              />
-                              <label htmlFor="Password" className="form-label">
-                                 Password
-                              </label>
-                           </div>
-                           <div>
-                              <button
-                                 onClick={e => handleLogin(e, formData.username, formData.password)}
-                                 id="login-submit"
-                                 type="submit"
-                                 className="w-100 btn btn-lg btn-primary"
-                              >
-                                 Log in
-                              </button>
-                           </div>
-                           <div className="d-flex justify-content-between pt-2">
-                              <p>
-                                 <Link>Forgot your password?</Link>
-                              </p>
-                              <p>
-                                 <Link to="/register">
-                                    Register as a new user
-                                 </Link>
-                              </p>
-                              <p>
-                                 <Link>Resend email confirmation</Link>
-                              </p>
-                           </div>
-                        </form>
-                     </section>
-                  </div>
-                  <div className="col-md-12 p-3 text-center">
-                     <section>
-                        <p className="divider-text d-flex pt-3">or</p>
-                        <div>
-                           <p>
-                              There are no external authentication services configured. See this{' '}
-                              <Link to="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                 article about setting up this ASP.NET application to support logging in via external
-                                 services
-                              </Link>
-                              .
-                           </p>
-                        </div>
-                     </section>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   );
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate(site_path.HOME);
+    }
+  }, [navigate]);
+
+  const saveUserToLocalStorage = ({ token, username, email, imageUrl }) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify({ username, email, imageUrl }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateLoginForm(formData);
+    if (Object.values(validationErrors).some((error) => error)) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data } = await loginUser(formData);
+      setToast({ type: "success", message: "Login successful!" });
+
+      saveUserToLocalStorage(data);
+
+      dispatch(actions.setIsLogin(true));
+      dispatch(actions.setUser(data));
+
+      setTimeout(() => navigate(site_path.HOME), 1000);
+      localStorage.setItem("firstLogin", true);
+    } catch (error) {
+      const errorMessage = "Invalid email or password.";
+      setErrors({ email: errorMessage, password: errorMessage });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center text-center gap-6 mt-12">
+      <Logo width={220} />
+      <PageTitle title="Sign In" />
+      <form className="w-full flex flex-col gap-6" onSubmit={handleLogin}>
+        <Input
+          id="email"
+          name="email"
+          label="Email"
+          type="text"
+          placeholder="Enter your email"
+          value={formData.email}
+          onChange={handleChange}
+          error={errors.email}
+        />
+        <Input
+          id="password"
+          name="password"
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          value={formData.password}
+          onChange={handleChange}
+          error={errors.password}
+        />
+        <div className="flex justify-center mt-12">
+          <Button
+            className="w-1/2"
+            size="lg"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing" : "Sign In"}
+          </Button>
+        </div>
+      </form>
+      <p className="text-16 text-gray-700">
+        Don't have an account?{" "}
+        <Link to="/register" className="text-orange">
+          Sign Up
+        </Link>
+      </p>
+      {toast && <ToastMessage type={toast.type} message={toast.message} />}
+    </div>
+  );
 }
 
 export default Login;

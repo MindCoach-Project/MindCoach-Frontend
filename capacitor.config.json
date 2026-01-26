@@ -1,0 +1,21 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "MindCoach",
+  "webDir": "build",
+  "android": {
+    "allowMixedContent": true
+  },
+  "bundledWebRuntime": false,
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "FirebaseMessaging": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "VoiceRecorder": {
+      "androidPermissions": ["android.permission.RECORD_AUDIO"]
+    }
+  }
+}
+

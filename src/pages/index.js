@@ -1,2 +1,17 @@
-export {default as Login} from "./Login"
-export {default as Home} from "./Home"
+export { default as Login } from "./Login";
+export { default as Home } from "./Home";
+export { default as Intro } from "./Intro";
+export { default as Register } from "./Register";
+export { default as ListTasks } from "./ListTasks";
+export { default as Profile } from "./Profile";
+export { default as TaskStatusPage } from "./TaskStatusPage";
+export { default as WorkTemplate } from "./WorkTemplate";
+export { default as HouseholdTemplate } from "./HouseholdTemplate";
+export { default as SportTemplate } from "./SportTemplate";
+export { default as RelaxTemplate } from "./RelaxTemplate";
+export { default as Reminder } from "./Reminder";
+export { default as OnBoard1 } from "./Step1";
+ export { default as OnBoard2 } from "./Step2";
+ export { default as OnBoard3 } from "./Step3";
+ export { default as OnBoard4 } from "./Step4";
+ export { default as OnBoard5 } from "./Step5";

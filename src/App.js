@@ -4,15 +4,16 @@ import { publicRoutes, privateRoutes } from './routes';
 import { DefaultLayout } from './layouts';
 import { useGlobalState } from './global/state';
 import { ProtectedRoute } from './components';
-
+import { ReminderNotificationManager } from './components/Notification/ReminderNotificationManager';
+import "./index.css";
 function App() {
 
-   const [state, dispatch] = useGlobalState();
-   console.log(state, dispatch)
-   
+   const { state } = useGlobalState();
+
    return (
       <Router>
          <div className="App">
+         {state.isLogin && <ReminderNotificationManager/>}
             <Routes>
                {publicRoutes.map((r, i) => {
                   let Layout = r.layout || DefaultLayout;

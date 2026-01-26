@@ -1,8 +1,8 @@
 ## build stage ##
 FROM node:20.17.0-alpine AS build
 WORKDIR /app
-COPY package*.json . 
-RUN npm install
+COPY package*.json ./ 
+RUN npm install --legacy-peer-deps
 COPY . . 
 RUN npm run build
 
@@ -17,12 +17,13 @@ RUN addgroup -g 10001 nodejs && \
     mkdir -p /tmp/log/nginx && \
     touch /tmp/nginx.pid && \
     chown -R reactapp:nodejs /tmp/nginx.pid && \
-    chown -R reactapp:nodejs /tmp/log/nginx
+    chown -R reactapp:nodejs /tmp/log/nginx && \
+    chown -R reactapp:nodejs /etc/nginx/nginx.conf
 
 COPY --from=build /app/build .
 RUN chown -R reactapp:nodejs /app && \
     chmod -R 750 /app
 
 USER reactapp
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
+ENTRYPOINT ["nginx", "-g", "daemon off;"]

@@ -4,4 +4,3 @@ npm-debug.log
 .git
 .DS_Store
 .env.dev
-.env.sta
